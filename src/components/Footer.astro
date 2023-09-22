@@ -1,5 +1,7 @@
 ---
 import Icon from "astro-icon";
+import "@fontsource/poppins"
+import "@fontsource-variable/work-sans"
 const today = new Date();
 const SOCIAL_LINKS = [
   {
@@ -22,7 +24,7 @@ const SOCIAL_LINKS = [
 const {c} = Astro.props;
 ---
 
-<footer class={"text-cyan-900 " + c}>
+<footer class={"text-cyan-900 " + c} style="font-family: 'Poppins', sans-serif;">
 	<div class="py-8">
 		<div class="mb-4">
 			<ul class="flex text-center justify-center gap-3">
