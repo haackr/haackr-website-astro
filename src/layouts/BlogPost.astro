@@ -16,7 +16,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={heroImage} />
-		
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:image" content={heroImage} />
+
 		<BaseHead title={title} description={description} />
 		<style is:global>
 			main {
