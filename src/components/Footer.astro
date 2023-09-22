@@ -18,23 +18,25 @@ const SOCIAL_LINKS = [
     icon: "fa-brands:strava",
   },
 ];
+
+const {c} = Astro.props;
 ---
 
-<footer class="">
+<footer class={"text-cyan-900 " + c}>
 	<div class="py-8">
 		<div class="mb-4">
 			<ul class="flex text-center justify-center gap-3">
 				{
 					SOCIAL_LINKS.map(({title, link, icon}) => (
 						<li>
-							<a href={link} title={title} class="hover:text-slate-800"><Icon name={icon} class="h-6"/></a>
+							<a href={link} title={title} class=""><Icon name={icon} class="h-6 text-cyan-900 hover:text-cyan-800"/></a>
 						</li>
 					))
 				}
 			</ul>
 		</div>
-		<p>
-			Made with ❤ by Ryan Haack.
+		<p class="text-cyan-900">
+			Made with ❤ by Ryan Haack using <a href="https://astro.build/"><Icon class="h-6 inline hover:text-cyan-800" name="simple-icons:astro" /></a>
 		</p>
 	</div>
 </footer>
