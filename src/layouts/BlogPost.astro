@@ -36,7 +36,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				box-shadow: var(--box-shadow);
 			}
 			.prose {
-				width: 720px;
+				width: 900px;
 				max-width: calc(100% - 2em);
 				margin: auto;
 				padding: 1em;
@@ -68,6 +68,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			}
 			.prose .astro-code {
 				margin-bottom: 2rem;
+				padding: 1rem;
+				border-radius: 1rem;
+				/* text-wrap: wrap; */
 			}
 		</style>
 		<ViewTransitions />
@@ -75,7 +78,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 
 	<body>
 		<Header />
-		<main class="py-10">
+		<main class="py-10 w-full p-3">
 			<article>
 				<div class="hero-image">
 					{heroImage && <img width={1020} height={510} src={heroImage} alt=""/>}
