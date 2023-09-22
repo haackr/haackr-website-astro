@@ -3,6 +3,8 @@ import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import "../../styles/global.css"
+import "@fontsource-variable/work-sans";
+import "@fontsource/poppins"
 
 const SITE_TITLE="Just The Temperature | Privacy Policy"
 const SITE_DESCRIPTION=SITE_TITLE;
@@ -11,6 +13,14 @@ const SITE_DESCRIPTION=SITE_TITLE;
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style is:global>
+      p {
+        font-family: "Poppins", sans-serif;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: "Work Sans Variable", sans-serif;
+      }
+    </style>
 	</head>
 	<html>
     <body class="h-screen">
