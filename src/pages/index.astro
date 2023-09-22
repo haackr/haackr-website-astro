@@ -8,6 +8,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { ViewTransitions } from 'astro:transitions';
 import  me from "../content/images/me.jpg"
 import '../styles/global.css'
+import '@fontsource/poppins'
+import '@fontsource-variable/work-sans'
 ---	
 
 <!doctype html>
@@ -15,6 +17,14 @@ import '../styles/global.css'
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<ViewTransitions />
+		<style is:global>
+			p {
+				font-family: "Poppins", sans-serif;
+			}
+			h1, h2, h3, h4, h5 ,h6 {
+				font-family: "Work Sans Variable", sans-serif;
+			}
+		</style>
 	</head>
 	<body>
 		<Header title={SITE_TITLE} />
