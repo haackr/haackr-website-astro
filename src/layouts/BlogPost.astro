@@ -15,9 +15,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 	<head>
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
-		<meta property="og:image" content={heroImage} />
+		<meta property="og:image" content=`https://master--dainty-pithivier-6b20c7.netlify.app${heroImage}` />
 		<meta property="twitter:card" content="summary_large_image" />
-		<meta property="twitter:image" content={heroImage} />
+		<meta property="twitter:image" content=`https://master--dainty-pithivier-6b20c7.netlify.app${heroImage}` />
 
 		<BaseHead title={title} description={description} />
 		<style is:global>
