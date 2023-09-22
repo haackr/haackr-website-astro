@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ContactForm from "../components/ContactForm.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { ViewTransitions } from 'astro:transitions';
 import  me from "../content/images/me.jpg"
 import '../styles/global.css'
 ---	
@@ -13,12 +14,13 @@ import '../styles/global.css'
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<ViewTransitions />
 	</head>
 	<body>
 		<Header title={SITE_TITLE} />
 		<main>
 			<header>
-				<div class="h-[75vh] flex max-w-[900px] m-auto p-2">
+				<div class="h-[75vh] flex max-w-[900px] m-auto p-3">
 					<div>
 						<h1 class="mt-[25vh] text-4xl">
 							Hi, I'm <span class="text-cyan-600 underline underline-offset-6">Ryan Haack</span>. <br />
