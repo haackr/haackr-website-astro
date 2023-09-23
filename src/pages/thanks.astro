@@ -1,17 +1,17 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import '../styles/global.css'
----	
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import "../styles/global.css";
+---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
     <div>
       <Header title={SITE_TITLE} />
       <main class="max-w-[900px] m-auto text-slate-900 text-center mt-[20vh]">
@@ -23,7 +23,7 @@ import '../styles/global.css'
         </h1>
         <h2>I'll be in touch soon!</h2>
       </main>
-      <Footer  c="fixed inset-x-0 bottom-0"/>
+      <Footer c="fixed inset-x-0 bottom-0" />
     </div>
-	</body>
+  </body>
 </html>

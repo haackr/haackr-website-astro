@@ -1,7 +1,7 @@
 ---
 import Icon from "astro-icon";
-import "@fontsource/poppins"
-import "@fontsource-variable/work-sans"
+import "@fontsource/poppins";
+import "@fontsource-variable/work-sans";
 const today = new Date();
 const SOCIAL_LINKS = [
   {
@@ -21,31 +21,44 @@ const SOCIAL_LINKS = [
   },
 ];
 
-const {c} = Astro.props;
+const { c } = Astro.props;
 ---
 
-<footer class={"text-cyan-900 " + c} style="font-family: 'Poppins', sans-serif;">
-	<div class="py-8">
-		<div class="mb-4">
-			<ul class="flex text-center justify-center gap-3">
-				{
-					SOCIAL_LINKS.map(({title, link, icon}) => (
-						<li>
-							<a href={link} title={title} class=""><Icon name={icon} class="h-6 text-cyan-900 hover:text-cyan-800"/></a>
-						</li>
-					))
-				}
-			</ul>
-		</div>
-		<p class="text-cyan-900">
-			Made with ❤ by Ryan Haack using <a href="https://astro.build/"><Icon class="h-6 inline hover:text-cyan-800" name="simple-icons:astro" /></a>
-		</p>
-	</div>
+<footer
+  class={"text-cyan-900 " + c}
+  style="font-family: 'Poppins', sans-serif;"
+>
+  <div class="py-8">
+    <div class="mb-4">
+      <ul class="flex text-center justify-center gap-3">
+        {
+          SOCIAL_LINKS.map(({ title, link, icon }) => (
+            <li>
+              <a href={link} title={title} class="">
+                <Icon
+                  name={icon}
+                  class="h-6 text-cyan-900 hover:text-cyan-800"
+                />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <p class="text-cyan-900">
+      Made with ❤ by Ryan Haack using <a href="https://astro.build/"
+        ><Icon
+          class="h-6 inline hover:text-cyan-800"
+          name="simple-icons:astro"
+        /></a
+      >
+    </p>
+  </div>
 </footer>
 <style>
-	footer {
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
-	}
+  footer {
+    background: linear-gradient(var(--gray-gradient)) no-repeat;
+    color: rgb(var(--gray));
+    text-align: center;
+  }
 </style>
