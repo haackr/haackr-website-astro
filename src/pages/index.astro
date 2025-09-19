@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { ReactTyped } from "react-typed";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -39,40 +40,53 @@ import "@fontsource-variable/work-sans";
           <div>
             <h1 class="mt-[25vh] text-3xl sm:text-4xl">
               Hi, I'm <span class="text-cyan-600 underline underline-offset-6"
-                >Ryan Haack</span
-              >. <br />
-               I'm a PMIS consultant and full stack developer.
+                >Ryan.</span
+              >
+              <br />
+              I'm a <span class="text-cyan-800">
+                <ReactTyped
+                  strings={[
+                    "PMIS Consultant.",
+                    "runner.",
+                    "guitarist.",
+                    "photographer.",
+                    "hiker.",
+                    "developer.",
+                  ]}
+                  typeSpeed={50}
+                  backSpeed={30}
+                  loop
+                  client:load
+                />
+              </span>
             </h1>
           </div>
         </div>
-      </header>
-      <article>
-        <div class="max-w-[900px] p-3 m-auto pb-10">
-          <h2 class="text-3xl text-center mb-5">About Me</h2>
-          <div class="flex flex-col items-center lg:flex-row-reverse">
-            <Image
-              src={me}
-              width={200}
-              class="rounded-full lg:ml-5 mb-5 lg:mb-0"
-              alt="Ryan Haack"
-            />
-            <p class="text-xl text-slate-800">
-              I'm a PMIS consultant and full stack developer from Albuquerque,
-              New Mexico. I'm currently working as a Senior Consultant at <a
-                href="https://avicado.com"
-                class="text-cyan-800 hover:text-cyan-600"
-                >Avicado Construction Technology Services</a
-              >. In my free time, I enjoy hiking, camping, running, climbing,
-              video games, and playing guitar.
-            </p>
+        <article>
+          <div class="max-w-[900px] p-3 m-auto pb-10">
+            <h2 class="text-3xl text-center mb-5">About Me</h2>
+            <div class="flex flex-col items-center lg:flex-row-reverse">
+              <Image
+                src={me}
+                width={200}
+                class="rounded-full lg:ml-5 mb-5 lg:mb-0"
+                alt="Ryan Haack"
+              />
+              <p class="text-xl text-slate-800">
+                I'm a PMIS consultant from Albuquerque, New Mexico. I'm
+                currently working as a Senior Consultant. In my free time, I
+                enjoy hiking, camping, running, climbing, running, playing
+                guitar, and hiking.
+              </p>
+            </div>
           </div>
-        </div>
-        <div class="py-20">
-          <h2 class="text-3xl text-center mb-5">Contact Me</h2>
-          <ContactForm />
-        </div>
-      </article>
-      <Footer />
+          <div class="py-20">
+            <h2 class="text-3xl text-center mb-5">Contact Me</h2>
+            <ContactForm />
+          </div>
+        </article>
+        <Footer />
+      </header>
     </main>
   </body>
 </html>
