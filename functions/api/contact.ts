@@ -19,7 +19,38 @@ export const onRequestPost: PagesFunction<Env> = async ({
       );
     }
 
-    const res = await fetch("https://api.resend.com/emails", {
+    let res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "notification@haackr.com",
+        to: "ryan@haackr.com",
+        reply_to: email as string,
+        template: {
+          id: "new-contact",
+          variables: {
+            sender_name: name as string,
+            sender_email: email as string,
+            message: message as string,
+          },
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Failed to Send Email" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
