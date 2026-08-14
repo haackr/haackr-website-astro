@@ -1,5 +1,8 @@
 {
   "name": "haackr-website-astro",
+  "assets": {
+    "directory": "./dist"
+  },
   "compatibility_date": "2026-08-14",
   "workers_dev": false,
   "route": {
