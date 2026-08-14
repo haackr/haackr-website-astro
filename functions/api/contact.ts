@@ -41,6 +41,8 @@ export const onRequestPost: PagesFunction<Env> = async ({
     });
 
     if (!res.ok) {
+      const error = await res.json();
+      console.error("Resend API Error:", error);
       return new Response(
         JSON.stringify({ success: false, error: "Failed to Send Email" }),
         {
@@ -81,6 +83,8 @@ export const onRequestPost: PagesFunction<Env> = async ({
         },
       );
     } else {
+      const error = await res.json();
+      console.error("Resend API Error:", error);
       return new Response(
         JSON.stringify({ success: false, error: "Failed to Send Email" }),
         {
@@ -90,6 +94,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
       );
     }
   } catch (err) {
+    console.error("Error:", err);
     return new Response(
       JSON.stringify({ success: false, error: "Internal Server Error" }),
       {
