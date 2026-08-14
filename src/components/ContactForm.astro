@@ -9,9 +9,9 @@ import "@fontsource/poppins";
   }
 </style>
 <form
+  id="contact-form"
   class="max-w-[900px] m-auto p-4"
   action="/thanks/"
-  data-netlify="true"
   name="contact"
   style={`font-family: "Poppins", sans-serif;`}
 >
@@ -60,8 +60,56 @@ import "@fontsource/poppins";
       required></textarea>
   </div>
   <button
+    id="submit-btn"
     type="submit"
     class="text-slate-100 bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
     >Submit</button
   >
+  <p id="form-status"></p>
 </form>
+
+<script>
+  
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const statusMessage = document.getElementById('form-status') as HTMLParagraphElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // UI Feedback: Disable button and show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    statusMessage.textContent = '';
+
+    try {
+      // Package the form data
+      const formData = new FormData(form);
+
+      // POST to your Cloudflare Pages Function
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        body: formData, 
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        statusMessage.textContent = 'Message sent successfully!';
+        statusMessage.style.color = 'green';
+        form.reset();
+      } else {
+        statusMessage.textContent = `Error: ${result.error}`;
+        statusMessage.style.color = 'red';
+      }
+    } catch (error) {
+      console.error('Submission failed', error);
+      statusMessage.textContent = 'Something went wrong. Please try again.';
+      statusMessage.style.color = 'red';
+    } finally {
+      // Restore the UI
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message';
+    }
+  });
+</script>

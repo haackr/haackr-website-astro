@@ -1,0 +1,10 @@
+{
+  "name": "haackr-website-astro",
+  "main": "dist/index.html",
+  "compatibility_date": "2026-08-14",
+  "workers_dev": false,
+  "route": {
+    "pattern": "haackr.com/*",
+    "zone_name": "haackr.com"
+  },
+}
