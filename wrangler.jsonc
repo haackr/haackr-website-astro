@@ -1,6 +1,5 @@
 {
   "name": "haackr-website-astro",
-  "main": "dist/",
   "compatibility_date": "2026-08-14",
   "workers_dev": false,
   "route": {
