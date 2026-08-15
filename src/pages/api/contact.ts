@@ -1,11 +1,13 @@
-export interface Env {
-  RESEND_API_KEY: string;
+import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
+
+export const prerender = false;
+
+interface CloudflareEnv {
+  RESEND_API_KEY?: string;
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({
-  request,
-  env,
-}): Promise<Response> => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
     const name = formData.get("name");
@@ -15,7 +17,18 @@ export const onRequestPost: PagesFunction<Env> = async ({
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const cfEnv = env as CloudflareEnv;
+    const resendApiKey = cfEnv.RESEND_API_KEY || (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : undefined);
+
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY is not set.");
+      return new Response(
+        JSON.stringify({ success: false, error: "Server configuration error" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -23,7 +36,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
         from: "notification@haackr.com",
@@ -49,7 +62,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
 
@@ -57,7 +70,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
         from: "Ryan Haack <ryan@haackr.com>",
@@ -81,7 +94,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
         {
           status: 200,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     } else {
       const error = await res.json();
@@ -91,7 +104,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
   } catch (err) {
@@ -101,7 +114,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      },
+      }
     );
   }
 };

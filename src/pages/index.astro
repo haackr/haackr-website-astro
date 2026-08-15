@@ -1,6 +1,5 @@
 ---
 import { Image } from "astro:assets";
-import { ReactTyped } from "react-typed";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -41,24 +40,7 @@ import "../styles/global.css";
                 >Ryan.</span
               >
               <br />
-              I'm a <span class="text-cyan-800">
-                <ReactTyped
-                  strings={[
-                    "PMIS Consultant.",
-                    "runner.",
-                    "guitarist.",
-                    "photographer.",
-                    "hiker.",
-                    "developer.",
-                    "mountain biker.",
-                  ]}
-                  typeSpeed={50}
-                  backSpeed={30}
-                  cursorChar="|"
-                  loop
-                  client:load
-                />
-              </span>
+              I'm a <span class="text-cyan-800"><span id="typed-output"></span></span>
             </h1>
           </div>
         </div>
@@ -88,5 +70,35 @@ import "../styles/global.css";
         <Footer />
       </header>
     </main>
+
+    <script>
+      import Typed from "typed.js";
+
+      function initTyped() {
+        const el = document.getElementById("typed-output");
+        if (!el) return;
+        return new Typed(el, {
+          strings: [
+            "PMIS Consultant.",
+            "runner.",
+            "guitarist.",
+            "photographer.",
+            "hiker.",
+            "developer.",
+            "mountain biker.",
+          ],
+          typeSpeed: 50,
+          backSpeed: 30,
+          cursorChar: "|",
+          loop: true,
+        });
+      }
+
+      let typedInstance: Typed | undefined;
+      document.addEventListener("astro:page-load", () => {
+        typedInstance?.destroy();
+        typedInstance = initTyped();
+      });
+    </script>
   </body>
 </html>

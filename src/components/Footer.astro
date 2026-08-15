@@ -1,30 +1,31 @@
 ---
-import { Icon } from "astro-icon/components";
+import Icon from "./Icon.astro";
+
 const SOCIAL_LINKS = [
   {
     title: "Github",
     link: "https://github.com/haackr",
-    icon: "fa-brands:github",
+    icon: "github" as const,
   },
   {
     title: "Linkedin",
     link: "https://www.linkedin.com/in/haackr/",
-    icon: "fa-brands:linkedin",
+    icon: "linkedin" as const,
   },
   {
     title: "Strava",
     link: "https://www.strava.com/athletes/ryan_haack",
-    icon: "fa-brands:strava",
+    icon: "strava" as const,
   },
   {
     title: "Instagram",
     link: "https://www.instagram.com/haackr_505/",
-    icon: "fa-brands:instagram",
+    icon: "instagram" as const,
   },
   {
     title: "Youtube",
     link: "https://www.youtube.com/@haackr",
-    icon: "fa-brands:youtube",
+    icon: "youtube" as const,
   },
 ];
 
@@ -44,7 +45,7 @@ const { c } = Astro.props;
               <a href={link} title={title} class="">
                 <Icon
                   name={icon}
-                  class="h-6 text-cyan-900 hover:text-cyan-800"
+                  class="h-6 w-6 text-cyan-900 hover:text-cyan-800"
                 />
               </a>
             </li>
@@ -55,8 +56,8 @@ const { c } = Astro.props;
     <p class="text-cyan-900">
       Made with ❤ by me using <a href="https://astro.build/"
         ><Icon
-          class="h-6 inline hover:text-cyan-800"
-          name="simple-icons:astro"
+          class="h-6 w-6 inline hover:text-cyan-800"
+          name="astro"
         /></a
       >
     </p>
