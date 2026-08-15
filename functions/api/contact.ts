@@ -32,6 +32,7 @@ export const onRequestPost: PagesFunction<Env> = async ({
         template: {
           id: "new-contact",
           variables: {
+            name: "Ryan",
             sender_name: name as string,
             sender_email: email as string,
             message: message as string,
