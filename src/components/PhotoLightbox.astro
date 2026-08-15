@@ -1,0 +1,223 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<div
+  id="photo-lightbox"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Photo Lightbox"
+>
+  <!-- Close Button -->
+  <button
+    id="lightbox-close"
+    class="absolute top-4 right-4 z-50 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
+    aria-label="Close Lightbox"
+  >
+    <Icon name="close" class="w-6 h-6" />
+  </button>
+
+  <!-- Previous Button -->
+  <button
+    id="lightbox-prev"
+    class="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
+    aria-label="Previous Photo"
+  >
+    <Icon name="chevron-left" class="w-7 h-7" />
+  </button>
+
+  <!-- Next Button -->
+  <button
+    id="lightbox-next"
+    class="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
+    aria-label="Next Photo"
+  >
+    <Icon name="chevron-right" class="w-7 h-7" />
+  </button>
+
+  <!-- Main Content Container -->
+  <div class="relative w-full h-full flex flex-col items-center justify-between p-4 sm:p-8 max-w-7xl mx-auto">
+    <!-- Top Bar / Counter -->
+    <div class="w-full flex justify-between items-center text-sm text-slate-400 pt-2 px-2">
+      <span id="lightbox-counter" class="font-mono text-xs tracking-wider"></span>
+    </div>
+
+    <!-- Center Image Container -->
+    <div class="flex-1 flex items-center justify-center w-full max-h-[78vh] my-auto">
+      <img
+        id="lightbox-img"
+        src=""
+        alt=""
+        class="max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] object-contain rounded-lg shadow-2xl transition-all duration-200"
+      />
+    </div>
+
+    <!-- Bottom Caption & Metadata Bar -->
+    <div class="w-full bg-slate-900/80 border border-white/10 rounded-xl p-4 text-center sm:text-left sm:flex sm:items-center sm:justify-between gap-4 backdrop-blur-sm">
+      <div>
+        <p id="lightbox-caption" class="text-white font-medium text-base sm:text-lg mb-1"></p>
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-slate-300">
+          <span id="lightbox-location" class="inline-flex items-center gap-1">
+            <Icon name="location" class="w-3.5 h-3.5 text-cyan-400" />
+            <span class="location-text"></span>
+          </span>
+          <span id="lightbox-camera" class="inline-flex items-center gap-1 text-slate-400">
+            <Icon name="camera" class="w-3.5 h-3.5 text-slate-400" />
+            <span class="camera-text"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="text-xs text-slate-500 hidden md:block">
+        <span>Use <kbd class="px-1.5 py-0.5 bg-white/10 rounded text-slate-300">←</kbd> <kbd class="px-1.5 py-0.5 bg-white/10 rounded text-slate-300">→</kbd> to navigate · <kbd class="px-1.5 py-0.5 bg-white/10 rounded text-slate-300">ESC</kbd> to close</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface PhotoData {
+    src: string;
+    alt: string;
+    caption: string;
+    location: string;
+    camera: string;
+  }
+
+  function setupLightbox() {
+    const lightbox = document.getElementById("photo-lightbox");
+    if (!lightbox) return;
+
+    const img = document.getElementById("lightbox-img") as HTMLImageElement;
+    const captionEl = document.getElementById("lightbox-caption");
+    const locationEl = document.querySelector("#lightbox-location .location-text");
+    const locationContainer = document.getElementById("lightbox-location");
+    const cameraEl = document.querySelector("#lightbox-camera .camera-text");
+    const cameraContainer = document.getElementById("lightbox-camera");
+    const counterEl = document.getElementById("lightbox-counter");
+    const closeBtn = document.getElementById("lightbox-close");
+    const prevBtn = document.getElementById("lightbox-prev");
+    const nextBtn = document.getElementById("lightbox-next");
+
+    const photoItems = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
+    if (photoItems.length === 0) return;
+
+    const photos: PhotoData[] = photoItems.map((el) => ({
+      src: el.dataset.photoSrc || "",
+      alt: el.dataset.photoAlt || "",
+      caption: el.dataset.photoCaption || "",
+      location: el.dataset.photoLocation || "",
+      camera: el.dataset.photoCamera || "",
+    }));
+
+    let currentIndex = 0;
+    let isOpen = false;
+
+    function renderPhoto(index: number) {
+      if (index < 0) index = photos.length - 1;
+      if (index >= photos.length) index = 0;
+      currentIndex = index;
+
+      const p = photos[currentIndex];
+      if (!p) return;
+
+      if (img) {
+        img.src = p.src;
+        img.alt = p.alt || p.caption || "Photograph";
+      }
+      if (captionEl) captionEl.textContent = p.caption || p.alt || "";
+      
+      if (locationContainer && locationEl) {
+        if (p.location) {
+          locationEl.textContent = p.location;
+          locationContainer.classList.remove("hidden");
+        } else {
+          locationContainer.classList.add("hidden");
+        }
+      }
+
+      if (cameraContainer && cameraEl) {
+        if (p.camera) {
+          cameraEl.textContent = p.camera;
+          cameraContainer.classList.remove("hidden");
+        } else {
+          cameraContainer.classList.add("hidden");
+        }
+      }
+
+      if (counterEl) {
+        counterEl.textContent = `${currentIndex + 1} / ${photos.length}`;
+      }
+    }
+
+    function openLightbox(index: number) {
+      isOpen = true;
+      renderPhoto(index);
+      lightbox?.classList.remove("opacity-0", "pointer-events-none");
+      lightbox?.classList.add("opacity-100", "pointer-events-auto");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      isOpen = false;
+      lightbox?.classList.add("opacity-0", "pointer-events-none");
+      lightbox?.classList.remove("opacity-100", "pointer-events-auto");
+      document.body.style.overflow = "";
+      if (img) img.src = "";
+    }
+
+    photoItems.forEach((el, index) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        openLightbox(index);
+      });
+    });
+
+    closeBtn?.addEventListener("click", closeLightbox);
+    prevBtn?.addEventListener("click", () => renderPhoto(currentIndex - 1));
+    nextBtn?.addEventListener("click", () => renderPhoto(currentIndex + 1));
+
+    lightbox?.addEventListener("click", (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    // Keyboard handlers
+    const keyHandler = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") renderPhoto(currentIndex - 1);
+      if (e.key === "ArrowRight") renderPhoto(currentIndex + 1);
+    };
+
+    window.addEventListener("keydown", keyHandler);
+
+    // Touch swipe support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    lightbox?.addEventListener("touchstart", (e: TouchEvent) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    lightbox?.addEventListener("touchend", (e: TouchEvent) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const swipeDistance = touchEndX - touchStartX;
+      if (Math.abs(swipeDistance) > 50) {
+        if (swipeDistance > 0) {
+          renderPhoto(currentIndex - 1);
+        } else {
+          renderPhoto(currentIndex + 1);
+        }
+      }
+    }
+  }
+
+  document.addEventListener("astro:page-load", setupLightbox);
+</script>
