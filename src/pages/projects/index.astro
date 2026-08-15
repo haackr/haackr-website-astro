@@ -1,0 +1,240 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Icon from "../../components/Icon.astro";
+import { ClientRouter } from "astro:transitions";
+import "../../styles/global.css";
+
+const allProjects = (
+  await getCollection("projects", ({ data }) => !data.draft)
+).sort((a, b) => {
+  if (a.data.order !== b.data.order) {
+    return a.data.order - b.data.order;
+  }
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+
+const featuredProjects = allProjects.filter((p) => p.data.featured);
+const otherProjects = allProjects.filter((p) => !p.data.featured);
+
+const PAGE_TITLE = "Projects | Ryan Haack";
+const PAGE_DESCRIPTION =
+  "A showcase of software engineering, PMIS workflow automation, and web development projects by Ryan Haack.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={PAGE_TITLE} description={PAGE_DESCRIPTION} />
+    <ClientRouter />
+    <style is:global>
+      p {
+        font-family: "Poppins", sans-serif;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Work Sans Variable", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main class="max-w-[960px] m-auto py-12 px-4">
+      <header class="mb-12 text-center sm:text-left">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
+          Projects
+        </h1>
+        <p class="text-lg sm:text-xl text-slate-600 max-w-2xl">
+          A selection of personal projects, PMIS automation solutions, and software applications I've built.
+        </p>
+      </header>
+
+      <!-- Featured Projects Section -->
+      {
+        featuredProjects.length > 0 && (
+          <section class="mb-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <span>Featured Work</span>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">
+                Spotlight
+              </span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {featuredProjects.map((project) => (
+                <article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
+                  {project.data.heroImage && (
+                    <a
+                      href={`/projects/${project.id}/`}
+                      class="block overflow-hidden aspect-video bg-slate-100 relative"
+                    >
+                      <Image
+                        src={project.data.heroImage}
+                        alt={project.data.heroImageAlt || project.data.title}
+                        width={800}
+                        height={450}
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </a>
+                  )}
+
+                  <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 text-xs text-slate-500 mb-2">
+                        <span class="inline-flex items-center gap-1">
+                          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+                          <FormattedDate date={project.data.pubDate} />
+                        </span>
+                      </div>
+
+                      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2">
+                        <a href={`/projects/${project.id}/`}>
+                          {project.data.title}
+                        </a>
+                      </h3>
+
+                      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+                        {project.data.description}
+                      </p>
+
+                      <!-- Tags -->
+                      {project.data.tags.length > 0 && (
+                        <div class="flex flex-wrap gap-1.5 mb-6">
+                          {project.data.tags.map((tag) => (
+                            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-700">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <a
+                        href={`/projects/${project.id}/`}
+                        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+                      >
+                        <span>View Details</span>
+                        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+                      </a>
+
+                      <div class="flex items-center gap-3">
+                        {project.data.repoUrl && (
+                          <a
+                            href={project.data.repoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-slate-500 hover:text-slate-900 transition-colors p-1"
+                            title="View Source Code"
+                          >
+                            <Icon name="github" class="w-4 h-4" />
+                          </a>
+                        )}
+                        {project.data.liveUrl && (
+                          <a
+                            href={project.data.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-cyan-700 hover:text-cyan-900 transition-colors p-1"
+                            title="Open Live Demo"
+                          >
+                            <Icon name="external" class="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      <!-- All / Other Projects Grid -->
+      <section>
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">
+          {featuredProjects.length > 0 ? "More Projects" : "All Projects"}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {(otherProjects.length > 0 ? otherProjects : allProjects).map((project) => (
+            <article class="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-cyan-400 hover:shadow-md transition-all group">
+              <div>
+                <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+                  <span class="inline-flex items-center gap-1">
+                    <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+                    <FormattedDate date={project.data.pubDate} />
+                  </span>
+                  <div class="flex items-center gap-2">
+                    {project.data.repoUrl && (
+                      <a
+                        href={project.data.repoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-slate-400 hover:text-slate-800 transition-colors"
+                        title="Source Code"
+                      >
+                        <Icon name="github" class="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {project.data.liveUrl && (
+                      <a
+                        href={project.data.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-cyan-600 hover:text-cyan-800 transition-colors"
+                        title="Live Demo"
+                      >
+                        <Icon name="external" class="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2">
+                  <a href={`/projects/${project.id}/`}>
+                    {project.data.title}
+                  </a>
+                </h3>
+
+                <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                  {project.data.description}
+                </p>
+
+                {project.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1.5 mb-4">
+                    {project.data.tags.map((tag) => (
+                      <span class="px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div class="pt-3 border-t border-slate-100">
+                <a
+                  href={`/projects/${project.id}/`}
+                  class="text-xs font-semibold text-cyan-700 hover:text-cyan-900 inline-flex items-center gap-1"
+                >
+                  <span>Read case study</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>

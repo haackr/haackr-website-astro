@@ -1,74 +1,32 @@
 ---
 import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
 import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
-import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
-import { getCollection } from "astro:content";
 import FormattedDate from "../../components/FormattedDate.astro";
+import Icon from "../../components/Icon.astro";
 import { ClientRouter } from "astro:transitions";
 import "../../styles/global.css";
 
 const posts = (
   await getCollection("blog", ({ data }) => !data.draft)
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const latestPost = posts[0];
+const otherPosts = posts.slice(1);
+
+const PAGE_TITLE = "Blog | Ryan Haack";
+const PAGE_DESCRIPTION =
+  "Articles, technical guides, and thoughts on software engineering, PMIS systems, and web development.";
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <style>
-      ul li {
-        width: calc(50% - 1rem);
-      }
-      ul li * {
-        text-decoration: none;
-        transition: 0.2s ease;
-      }
-      ul li:first-child {
-        width: 100%;
-        margin-bottom: 1rem;
-        text-align: center;
-      }
-      ul li:first-child img {
-        width: 100%;
-      }
-      ul li img {
-        margin-bottom: 0.5rem;
-        border-radius: 12px;
-      }
-      ul li a {
-        display: block;
-      }
-      .title {
-        margin: 0;
-        color: rgb(var(--black));
-        line-height: 1;
-      }
-      .date {
-        margin: 0;
-        color: rgb(var(--gray));
-      }
-      ul li a:hover h4,
-      ul li a:hover .date {
-        color: rgb(var(--accent));
-      }
-      ul a:hover img {
-        box-shadow: var(--box-shadow);
-      }
-      @media (max-width: 720px) {
-        ul {
-          gap: 0.5em;
-        }
-        ul li {
-          width: 100%;
-          text-align: center;
-        }
-        ul li:first-child {
-          margin-bottom: 0;
-        }
-      }
+    <BaseHead title={PAGE_TITLE} description={PAGE_DESCRIPTION} />
+    <ClientRouter />
+    <style is:global>
       p {
         font-family: "Poppins", sans-serif;
       }
@@ -81,35 +39,139 @@ const posts = (
         font-family: "Work Sans Variable", sans-serif;
       }
     </style>
-    <ClientRouter />
   </head>
   <body>
     <Header />
-    <main class="max-w-[900px] m-auto mt-10 gap-2 list-none p-3">
-      <section>
-        <ul class="flex flex-wrap">
-          {
-            posts.map((post) => (
-              <li class="w-1/2 first:w-full">
-                <a href={`/blog/${post.id}/`}>
-                  {post.data.heroImage && (
-                    <Image
-                      width={720}
-                      height={360}
-                      src={post.data.heroImage}
-                      alt={post.data.heroImageAlt || post.data.title}
-                    />
-                  )}
-                  <h4 class="title text-2xl">{post.data.title}</h4>
-                  <p class="date">
-                    <FormattedDate date={post.data.pubDate} />
-                  </p>
+    <main class="max-w-[960px] m-auto py-12 px-4">
+      <header class="mb-12 text-center sm:text-left">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
+          Blog
+        </h1>
+        <p class="text-lg sm:text-xl text-slate-600 max-w-2xl">
+          Articles, technical guides, and thoughts on software engineering, PMIS systems, and development.
+        </p>
+      </header>
+
+      <!-- Latest Featured Article -->
+      {
+        latestPost && (
+          <section class="mb-14">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <span>Latest Article</span>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">
+                New
+              </span>
+            </h2>
+
+            <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group grid grid-cols-1 md:grid-cols-12 gap-0">
+              {latestPost.data.heroImage && (
+                <a
+                  href={`/blog/${latestPost.id}/`}
+                  class="block overflow-hidden md:col-span-6 aspect-video md:aspect-auto bg-slate-100"
+                >
+                  <Image
+                    src={latestPost.data.heroImage}
+                    alt={latestPost.data.heroImageAlt || latestPost.data.title}
+                    width={900}
+                    height={500}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </a>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
+              )}
+
+              <div class={`p-6 sm:p-8 flex flex-col justify-between ${latestPost.data.heroImage ? "md:col-span-6" : "md:col-span-12"}`}>
+                <div>
+                  <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
+                    <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+                    <FormattedDate date={latestPost.data.pubDate} />
+                  </div>
+
+                  <h3 class="text-2xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-3 leading-snug">
+                    <a href={`/blog/${latestPost.id}/`}>
+                      {latestPost.data.title}
+                    </a>
+                  </h3>
+
+                  <p class="text-slate-600 line-clamp-4 mb-6 leading-relaxed">
+                    {latestPost.data.description}
+                  </p>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <a
+                    href={`/blog/${latestPost.id}/`}
+                    class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+                  >
+                    <span>Read Article</span>
+                    <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </section>
+        )
+      }
+
+      <!-- Other Articles Grid -->
+      {
+        otherPosts.length > 0 && (
+          <section>
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">
+              All Articles
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {otherPosts.map((post) => (
+                <article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
+                  {post.data.heroImage && (
+                    <a
+                      href={`/blog/${post.id}/`}
+                      class="block overflow-hidden aspect-video bg-slate-100"
+                    >
+                      <Image
+                        src={post.data.heroImage}
+                        alt={post.data.heroImageAlt || post.data.title}
+                        width={720}
+                        height={360}
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </a>
+                  )}
+
+                  <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
+                        <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+                        <FormattedDate date={post.data.pubDate} />
+                      </div>
+
+                      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2 leading-snug">
+                        <a href={`/blog/${post.id}/`}>
+                          {post.data.title}
+                        </a>
+                      </h3>
+
+                      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+                        {post.data.description}
+                      </p>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <a
+                        href={`/blog/${post.id}/`}
+                        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+                      >
+                        <span>Read Article</span>
+                        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )
+      }
     </main>
     <Footer />
   </body>

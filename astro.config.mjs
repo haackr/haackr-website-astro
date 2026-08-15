@@ -6,7 +6,7 @@ import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://haackr.dev",
+  site: "https://haackr.com",
   adapter: cloudflare({
     imageService: "compile",
     platformProxy: {

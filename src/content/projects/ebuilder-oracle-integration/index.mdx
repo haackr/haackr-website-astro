@@ -1,0 +1,48 @@
+---
+title: "e-Builder & Oracle ERP Integration Pipeline"
+description: "A serverless Python middleware pipeline automating bidirectional financial data synchronization and document routing between e-Builder PMIS and Oracle ERP."
+pubDate: 2026-08-15
+repoUrl: https://github.com/haackr/aps-eb-oracle-integration
+tags: ["python", "gcp-cloud-run", "terraform", "oracle-erp", "e-builder", "etl"]
+featured: false
+order: 3
+---
+
+## Overview
+
+Managing large-scale public capital improvement programs requires real-time financial reconciliation between construction management and district-wide accounting. For Albuquerque Public Schools (APS), critical project data lived across two siloed enterprise platforms: **e-Builder** (the construction Project Management Information System) and **Oracle ERP** (the district's core financial and procurement system of record).
+
+Without automation, accounting teams and project managers had to manually extract, convert, and re-enter requisitions, purchase order changes, and accounts payable invoices between systems. This integration service establishes a robust, automated bidirectional data pipeline that moves, transforms, and synchronizes financial documents and records between e-Builder's REST API and Oracle's secure SFTP gateway.
+
+## Key Features & Workflows
+
+- **Automated e-Builder to Oracle Exports:**
+  - **Requisitions Export:** Queries and extracts daily approved requisitions (`eB_Reqs_YYYYMMDD`) from e-Builder and securely transfers them to Oracle
+  SFTP inbound directories.
+  - **Invoices Export:** Polls and transfers daily purchase order invoice batches (`eB_Invoices_YYYYMMDD`) to Oracle for accounting reconciliation.
+  - **PO Change Order Aggregation:** Automatically identifies, validates, and merges disparate daily Change Order and Purchase Order Change records (`POC`/`COP`) into standardized consolidated CSV payloads (`eB_Change_YYYYMMDDHHMM.csv`) for Oracle ingestion.
+
+- **Automated Oracle to e-Builder Imports:**
+  - **Requisition & PO Number Ingestion:** Pulls processed requisition numbers and issued purchase order files from Oracle outbound directories androutes them into targeted e-Builder project document structures.
+  - **AP Invoice Import:** Synchronizes processed AP invoice status files into e-Builder to maintain real-time visibility into project actuals and balances.
+
+- **In-Flight Format Conversion:** Features a built-in conversion engine that transforms legacy binary `.xls` files from Oracle into modern `.xlsx` workbooks on the fly, ensuring full compatibility with e-Builder's document ingestion standards.
+
+- **Atomic, Safe Ingestion Lifecycles:** Enforces transactional safety—source files on the SFTP server are verified and only removed upon receiving an explicit success confirmation from e-Builder's document API.
+
+## Engineering & Reliability Highlights
+
+- **Serverless & Event-Driven:** Built as containerized Python workloads executing on **GCP Cloud Run Jobs** triggered by **Cloud Scheduler**, running with zero idle infrastructure costs.
+- **Enterprise Security Posture:** Integrates with **GCP Secret Manager** and fine-grained IAM roles to isolate scheduling privileges from runtime execution, guaranteeing zero hardcoded credentials and secure transport encryption.
+- **Clean Architecture & Portability:** Implemented with Protocol-based ports and adapters, fully decoupling domain orchestration from transport clients
+  (`httpx` for REST APIs and `paramiko` for SFTP), enabling isolated unit and integration testing.
+- **Full Type Safety & Rigorous Linting:** Enforces 100% strict `mypy` typing, schema validation via `pydantic v2`, and high-coverage test suites managed with `pytest` and `ruff`.
+- **Infrastructure as Code:** All Cloud Run jobs, scheduler triggers, IAM bindings, and Secret Manager references are declaratively managed and provisioned via **Terraform**.
+
+## Architecture & Tech Stack
+
+- **Language & Core Libraries:** Python 3.11, Pydantic v2, HTTPX, Paramiko (SFTP), OpenPyXL, XLRD
+- **Enterprise Platforms:** e-Builder Enterprise REST API, Oracle ERP Cloud (SFTP Data Gateway)
+- **Cloud Infrastructure (GCP):** Cloud Run Jobs, Cloud Scheduler, Secret Manager, Artifact Registry, IAM
+- **Infrastructure as Code (IaC):** Terraform
+- **Quality & Testing:** Pytest, Pytest-Cov, Ruff, Mypy (Strict Mode)

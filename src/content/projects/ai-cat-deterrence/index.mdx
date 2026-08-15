@@ -1,0 +1,40 @@
+---
+title: "AI Cat Deterrence"
+description: "An edge AI-powered hardware system that detects neighborhood cats using a fine-tuned YOLO model and safely deters them with a sprinkler."
+pubDate: 2026-08-15
+repoUrl: https://github.com/haackr/collect-cat-images
+heroImage: ./hero.png
+heroImageAlt: "Night vision camera feed showing a bounding box around a detected cat."
+tags: ["python", "yolo", "raspberry-pi", "computer-vision", "edge-ai"]
+featured: true
+order: 2
+---
+
+## Overview
+
+Neighborhood cats treating front-yard flower beds as personal litterboxes is a common frustration, and commercial repellent sprays are often entirely ineffective. To solve this without resorting to manual intervention, I engineered an automated, edge-AI deterrent system. By combining a low-light camera, a Raspberry Pi 5, and a custom-tuned YOLO computer vision model, this system actively monitors the yard, accurately identifies feline intruders, and triggers a physical lawn sprinkler via GPIO relays to humanely deter them. 
+
+## Current Features
+
+- **Real-Time Feline Detection:** Evaluates video feeds locally to identify cats while ignoring standard neighborhood traffic.
+- **Automated Data Pipeline:** Includes a lightweight motion-detection script that continuously curates and formats custom training data.
+- **Advanced False-Positive Filtering:**
+  - Utilizes class-specific confidence thresholds to avoid mistaking humans for cats.
+  - Implements bounding-box size limits to ignore static landscaping and bushes.
+  - Tracks spatial movement to ensure detections are actual moving targets.
+- **Hardware Actuation:** Interfaces directly with physical relays and solenoid valves to trigger a garden hose sprinkler automatically.
+
+## Highlights & Outcomes
+
+- **Optimized Edge Inference**: Achieved high-performance, local inference without cloud dependencies by leveraging the Raspberry Pi 26 TOPS AI HAT+.
+- **Robust Environmental Adaptation**: Overcame the limitations of off-the-shelf COCO datasets by engineering a custom pipeline to fine-tune the model against specific, real-world yard conditions (including harsh shadows and infrared night vision).
+- **Weatherproof Deployment**: Successfully designed and deployed a durable hardware enclosure with proper wiring protections to shield the electronics from moisture and the Albuquerque heat.
+- **Hardware/Software Integration**: Bridged the gap between high-level Python machine learning scripts and low-level electronic engineering (actuating valves via GPIO pins).
+
+## Architecture
+
+- **Core Language**: Python
+- **Vision Model**: YOLO26m (Fine-tuned)
+- **Controller Hardware**: Raspberry Pi 5 & 26 TOPS AI HAT+
+- **Optical Hardware**: Arducam B0647 (STARVIS IMX290)
+- **Physical Actuation**: 5V Relay, 12V Solenoid Valve, Standard Lawn Sprinkler

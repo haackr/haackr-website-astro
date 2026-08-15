@@ -1,0 +1,44 @@
+---
+title: "eb cli"
+description: "A CLI tool leveraging headless browser automation to execute UI-only e-Builder workflows."
+pubDate: 2026-08-15
+repoUrl: https://github.com/haackr/eb-cli
+heroImage: ./hero.png
+heroImageAlt: "Terminal window showing eB CLI automation process"
+tags: ["typescript", "puppeteer", "oclif", "e-Builder"]
+featured: true
+order: 1
+---
+
+## Overview
+
+While e-Builder provides APIs and tools for admins to perform some bulk operations, it is lacking in many areas. As an example, while it is possible to import users in bulk to an account, there is no way to remove users in bulk from the account. Instead, admins must tediously remove users one at a time. `eb-cli` bridges this gap. By leveraging headless browser automation to execute tasks that lack native API endpoints or built-in tools, this command-line interface empowers administrators to bypass tedious UI navigation and execute bulk operations directly from the terminal.
+
+## Current Features
+
+- **Bulk User Operations:**
+  - Remove users from the account
+  - Remove users from project roles
+  - Remove users from projects
+  - Set SSO flag for users
+  - Report on SSO flag status
+- **Bulk Budget Item Operations:**
+  - Delete budget items
+  - Set the "Allow Charges" and "Approval Required for Change" flags
+  - Change item descriptions
+- **And Much More...**
+
+## Highlights & Outcomes
+
+- **Saves thousands of hours of work:** This tool has been used in production environments saving thousands of hours of work for consultants at [Avicado](https://avicado.com).
+- **API Limitation Bypass**: Unlocked programmatic access to UI-only features, turning thousands of manual graphical interface interactions into automated, scriptable terminal commands.
+- **Bulk User Administration**: Engineered automated workflows to seamlessly remove users, strip obsolete project roles, and update complex user custom fields across the enterprise environment.
+- **Automated Budget Management**: Streamlined financial administration by automating the deletion and modification of budget line fields, eliminating hours of repetitive data entry and reducing human error.
+- **Extensible Architecture**: Built a robust and scalable command architecture that allows for the rapid development and integration of future automation scripts as system requirements evolve.
+
+## Architecture
+
+- **Core Language**: TypeScript
+- **CLI Framework**: oclif (Open CLI Framework)
+- **Automation Engine**: Puppeteer 
+- **Target Platform**: e-Builder PMIS
