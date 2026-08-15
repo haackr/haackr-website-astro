@@ -6,18 +6,16 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import ContactForm from "../components/ContactForm.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import me from "../content/images/me_new.jpg";
 import "../styles/global.css";
-import "@fontsource/poppins";
-import "@fontsource-variable/work-sans";
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <ViewTransitions />
+    <ClientRouter />
     <style is:global>
       p {
         font-family: "Poppins", sans-serif;
