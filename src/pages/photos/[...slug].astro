@@ -29,7 +29,8 @@ const optimizedPhotos = await Promise.all(
   photos.map(async (photo) => {
     const fullOptimized = await getImage({
       src: photo.src,
-      width: Math.min(photo.src.width, 2400),
+      width: Math.min(photo.src.width, 2000),
+      quality: 85,
       format: "webp",
     });
     return {
@@ -68,22 +69,55 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
         margin-bottom: 1.5rem;
       }
 
-      :root {
-        --gallery-row-height: 180px;
+      /* Mobile: single-column full-width vertical stack */
+      .photo-gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
       }
+
+      .photo-card {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .gallery-last-spacer {
+        display: none;
+      }
+
+      /* Tablet & Desktop: justified flex row layout */
       @media (min-width: 640px) {
         :root {
           --gallery-row-height: 230px;
         }
+
+        .photo-gallery {
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+        }
+
+        .photo-card {
+          width: auto;
+          flex-grow: var(--ar, 1.5);
+          flex-basis: calc(var(--gallery-row-height, 230px) * var(--ar, 1.5));
+        }
+
+        .gallery-last-spacer {
+          display: block;
+          flex-grow: 99999;
+          flex-basis: calc(var(--gallery-row-height, 230px) * 1.5);
+          height: 0;
+          min-height: 0;
+          margin: 0;
+          padding: 0;
+        }
       }
+
       @media (min-width: 1024px) {
         :root {
           --gallery-row-height: 270px;
         }
-      }
-
-      .photo-card {
-        min-width: 0;
       }
     </style>
   </head>
@@ -134,9 +168,9 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
         </div>
       </header>
 
-      <!-- Photo Gallery Justified Row Layout -->
+      <!-- Photo Gallery Layout -->
       <section class="mt-8">
-        <div class="photo-gallery flex flex-wrap gap-2 sm:gap-3">
+        <div class="photo-gallery">
           {
             optimizedPhotos.map((photo, index) => {
               const ar =
@@ -149,8 +183,7 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
                   type="button"
                   class="photo-card group relative block overflow-hidden rounded-xl bg-slate-100 border border-slate-200/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
                   style={{
-                    flexGrow: roundedAr,
-                    flexBasis: `calc(var(--gallery-row-height, 280px) * ${roundedAr})`,
+                    "--ar": roundedAr,
                     aspectRatio: `${photo.src.width} / ${photo.src.height}`,
                     maxWidth: "100%",
                   }}
@@ -167,8 +200,13 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
                   <Image
                     src={photo.src}
                     alt={photo.alt || photo.caption || title}
-                    width={Math.min(photo.src.width, 1400)}
+                    width={600}
+                    quality={80}
+                    format="webp"
+                    widths={[360, 600, 900]}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                     loading={index < 4 ? "eager" : "lazy"}
+                    decoding="async"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 block"
                   />
 
@@ -188,20 +226,8 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
               );
             })
           }
-          <!-- Spacer element to absorb extra width on the last row and prevent over-stretching -->
-          <div
-            class="gallery-last-spacer pointer-events-none"
-            aria-hidden="true"
-            style={{
-              flexGrow: 99999,
-              flexBasis: "calc(var(--gallery-row-height, 280px) * 1.5)",
-              height: 0,
-              minHeight: 0,
-              margin: 0,
-              padding: 0,
-            }}
-          >
-          </div>
+          <!-- Spacer element (only active on desktop rows) -->
+          <div class="gallery-last-spacer pointer-events-none" aria-hidden="true"></div>
         </div>
       </section>
 

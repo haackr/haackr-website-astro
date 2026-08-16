@@ -81,6 +81,12 @@ const PAGE_DESCRIPTION =
                         alt={project.data.heroImageAlt || project.data.title}
                         width={800}
                         height={450}
+                        quality={80}
+                        format="webp"
+                        widths={[400, 800]}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        loading="eager"
+                        decoding="async"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </a>

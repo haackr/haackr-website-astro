@@ -78,6 +78,13 @@ const PAGE_DESCRIPTION =
                   alt={featuredGallery.data.coverImageAlt || featuredGallery.data.title}
                   width={900}
                   height={500}
+                  quality={82}
+                  format="webp"
+                  widths={[400, 750, 1100]}
+                  sizes="(max-width: 768px) 100vw, 55vw"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5">
@@ -145,6 +152,12 @@ const PAGE_DESCRIPTION =
                   alt={gallery.data.coverImageAlt || gallery.data.title}
                   width={720}
                   height={400}
+                  quality={80}
+                  format="webp"
+                  widths={[360, 720]}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  loading="lazy"
+                  decoding="async"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">

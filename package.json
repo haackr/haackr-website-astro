@@ -27,6 +27,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@cloudflare/workers-types": "^5.20260815.1",
+    "@tailwindcss/typography": "^0.5.20",
     "typescript": "^6.0.3",
     "wrangler": "^4.123.0"
   }

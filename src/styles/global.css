@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@fontsource-variable/work-sans";
 @import "@fontsource/poppins";
+@plugin "@tailwindcss/typography";
 
 /*
   The CSS in this style tag is based off of Bear Blog's default CSS.
@@ -43,6 +44,6 @@ body {
   word-wrap: break-word;
   overflow-wrap: break-word;
   color: rgb(var(--gray-dark));
-  font-size: 20px;
+  font-size: 1rem;
   line-height: 1.7;
 }

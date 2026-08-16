@@ -44,10 +44,10 @@ const PAGE_DESCRIPTION =
     <Header />
     <main class="max-w-[960px] m-auto py-12 px-4">
       <header class="mb-12 text-center sm:text-left">
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
           Blog
         </h1>
-        <p class="text-lg sm:text-xl text-slate-600 max-w-2xl">
+        <p class="text-md sm:text-xl text-slate-600 max-w-2xl">
           Articles, technical guides, and thoughts on software engineering, PMIS systems, and development.
         </p>
       </header>
@@ -74,6 +74,13 @@ const PAGE_DESCRIPTION =
                     alt={latestPost.data.heroImageAlt || latestPost.data.title}
                     width={900}
                     height={500}
+                    quality={82}
+                    format="webp"
+                    widths={[400, 750, 1000]}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </a>
@@ -133,6 +140,12 @@ const PAGE_DESCRIPTION =
                         alt={post.data.heroImageAlt || post.data.title}
                         width={720}
                         height={360}
+                        quality={80}
+                        format="webp"
+                        widths={[360, 720]}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        loading="lazy"
+                        decoding="async"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </a>

@@ -35,7 +35,7 @@ import "../styles/global.css";
       <header>
         <div class="h-[50vh] flex max-w-[960px] m-auto p-4">
           <div>
-            <h1 class="mt-[25vh] text-3xl sm:text-4xl">
+            <h1 class="mt-[25vh] text-2xl sm:text-4xl">
               Hi, I'm <span class="text-cyan-600 underline underline-offset-6"
                 >Ryan.</span
               >
@@ -46,26 +46,31 @@ import "../styles/global.css";
         </div>
         <article>
           <div class="max-w-[960px] p-4 m-auto pb-10">
-            <h2 class="text-3xl text-center mb-5">About Me</h2>
+            <h2 class="text-2xl sm:text-3xl text-center mb-5 font-extrabold">About Me</h2>
             <div class="flex flex-col items-center lg:flex-row-reverse">
               <Image
                 src={me}
                 width={200}
+                height={200}
+                quality={85}
+                format="webp"
+                loading="eager"
+                decoding="async"
                 class="rounded-full lg:ml-10 mb-5 lg:mb-0"
                 alt="Ryan Haack"
               />
               <div>
-                <p class="text-xl text-slate-800 mb-3">
+                <p class="text-l text-slate-800 mb-3">
                   I'm a software developer and PMIS consultant from Albuquerque, New Mexico. I'm currently working as a Lead Senior Consultant at <a href="https://avicado.com">Avicado</a> and pursuing my master's in computer science at CU Boulder.
                 </p>
-                <p>
+                <p class="text-l text-slate-800 mb-3">
                   Day-to-day, my work centers around modernizing project management systems, developing custom software tools, and improving data visibility for teams. In my free time, I enjoy spending time outdoors running, hiking, and camping.
                 </p>
               </div>
             </div>
           </div>
           <div class="py-20">
-            <h2 class="text-3xl text-center mb-5">Contact Me</h2>
+            <h2 class="text-2xl sm:text-3xl text-center mb-5 font-extrabold">Contact Me</h2>
             <ContactForm />
           </div>
         </article>
