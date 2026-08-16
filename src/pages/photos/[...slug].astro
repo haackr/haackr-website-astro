@@ -1,6 +1,6 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
-import { Image } from "astro:assets";
+import { Image, getImage } from "astro:assets";
 import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -23,6 +23,21 @@ type Props = CollectionEntry<"galleries">;
 const gallery = Astro.props;
 const { Content } = await render(gallery);
 const { title, description, pubDate, location, photos = [], coverImage } = gallery.data;
+
+// Pre-optimize high-resolution images for the lightbox
+const optimizedPhotos = await Promise.all(
+  photos.map(async (photo) => {
+    const fullOptimized = await getImage({
+      src: photo.src,
+      width: Math.min(photo.src.width, 2400),
+      format: "webp",
+    });
+    return {
+      ...photo,
+      lightboxSrc: fullOptimized.src,
+    };
+  })
+);
 
 const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
 ---
@@ -123,7 +138,7 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
       <section class="mt-8">
         <div class="photo-gallery flex flex-wrap gap-2 sm:gap-3">
           {
-            photos.map((photo, index) => {
+            optimizedPhotos.map((photo, index) => {
               const ar =
                 photo.src.width && photo.src.height
                   ? photo.src.width / photo.src.height
@@ -140,7 +155,7 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
                     maxWidth: "100%",
                   }}
                   data-photo-item
-                  data-photo-src={photo.src.src}
+                  data-photo-src={photo.lightboxSrc}
                   data-photo-alt={
                     photo.alt || photo.caption || `${title} photo ${index + 1}`
                   }

@@ -85,36 +85,32 @@ import Icon from "./Icon.astro";
     camera: string;
   }
 
-  function setupLightbox() {
+  function initLightbox() {
     const lightbox = document.getElementById("photo-lightbox");
     if (!lightbox) return;
 
-    const img = document.getElementById("lightbox-img") as HTMLImageElement;
-    const captionEl = document.getElementById("lightbox-caption");
-    const locationEl = document.querySelector("#lightbox-location .location-text");
-    const locationContainer = document.getElementById("lightbox-location");
-    const cameraEl = document.querySelector("#lightbox-camera .camera-text");
-    const cameraContainer = document.getElementById("lightbox-camera");
-    const counterEl = document.getElementById("lightbox-counter");
-    const closeBtn = document.getElementById("lightbox-close");
-    const prevBtn = document.getElementById("lightbox-prev");
-    const nextBtn = document.getElementById("lightbox-next");
-
-    const photoItems = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
-    if (photoItems.length === 0) return;
-
-    const photos: PhotoData[] = photoItems.map((el) => ({
-      src: el.dataset.photoSrc || "",
-      alt: el.dataset.photoAlt || "",
-      caption: el.dataset.photoCaption || "",
-      location: el.dataset.photoLocation || "",
-      camera: el.dataset.photoCamera || "",
-    }));
+    // Prevent duplicate global initialization
+    if ((window as any).__photoLightboxInitialized) return;
+    (window as any).__photoLightboxInitialized = true;
 
     let currentIndex = 0;
     let isOpen = false;
 
+    function getPhotos(): PhotoData[] {
+      const items = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
+      return items.map((el) => ({
+        src: el.dataset.photoSrc || el.getAttribute("data-photo-src") || "",
+        alt: el.dataset.photoAlt || el.getAttribute("data-photo-alt") || "",
+        caption: el.dataset.photoCaption || el.getAttribute("data-photo-caption") || "",
+        location: el.dataset.photoLocation || el.getAttribute("data-photo-location") || "",
+        camera: el.dataset.photoCamera || el.getAttribute("data-photo-camera") || "",
+      }));
+    }
+
     function renderPhoto(index: number) {
+      const photos = getPhotos();
+      if (photos.length === 0) return;
+
       if (index < 0) index = photos.length - 1;
       if (index >= photos.length) index = 0;
       currentIndex = index;
@@ -122,102 +118,157 @@ import Icon from "./Icon.astro";
       const p = photos[currentIndex];
       if (!p) return;
 
-      if (img) {
-        img.src = p.src;
-        img.alt = p.alt || p.caption || "Photograph";
+      const currentImg = document.getElementById("lightbox-img") as HTMLImageElement;
+      const currentCaption = document.getElementById("lightbox-caption");
+      const currentLocationText = document.querySelector("#lightbox-location .location-text");
+      const currentLocationContainer = document.getElementById("lightbox-location");
+      const currentCameraText = document.querySelector("#lightbox-camera .camera-text");
+      const currentCameraContainer = document.getElementById("lightbox-camera");
+      const currentCounter = document.getElementById("lightbox-counter");
+
+      if (currentImg) {
+        currentImg.src = p.src;
+        currentImg.alt = p.alt || p.caption || "Photograph";
       }
-      if (captionEl) captionEl.textContent = p.caption || p.alt || "";
-      
-      if (locationContainer && locationEl) {
+
+      if (currentCaption) {
+        currentCaption.textContent = p.caption || p.alt || "";
+      }
+
+      if (currentLocationContainer && currentLocationText) {
         if (p.location) {
-          locationEl.textContent = p.location;
-          locationContainer.classList.remove("hidden");
+          currentLocationText.textContent = p.location;
+          currentLocationContainer.classList.remove("hidden");
         } else {
-          locationContainer.classList.add("hidden");
+          currentLocationContainer.classList.add("hidden");
         }
       }
 
-      if (cameraContainer && cameraEl) {
+      if (currentCameraContainer && currentCameraText) {
         if (p.camera) {
-          cameraEl.textContent = p.camera;
-          cameraContainer.classList.remove("hidden");
+          currentCameraText.textContent = p.camera;
+          currentCameraContainer.classList.remove("hidden");
         } else {
-          cameraContainer.classList.add("hidden");
+          currentCameraContainer.classList.add("hidden");
         }
       }
 
-      if (counterEl) {
-        counterEl.textContent = `${currentIndex + 1} / ${photos.length}`;
+      if (currentCounter) {
+        currentCounter.textContent = `${currentIndex + 1} / ${photos.length}`;
       }
     }
 
     function openLightbox(index: number) {
+      const currentLightbox = document.getElementById("photo-lightbox");
+      if (!currentLightbox) return;
       isOpen = true;
       renderPhoto(index);
-      lightbox?.classList.remove("opacity-0", "pointer-events-none");
-      lightbox?.classList.add("opacity-100", "pointer-events-auto");
+      currentLightbox.classList.remove("opacity-0", "pointer-events-none");
+      currentLightbox.classList.add("opacity-100", "pointer-events-auto");
       document.body.style.overflow = "hidden";
     }
 
     function closeLightbox() {
+      const currentLightbox = document.getElementById("photo-lightbox");
+      if (!currentLightbox) return;
       isOpen = false;
-      lightbox?.classList.add("opacity-0", "pointer-events-none");
-      lightbox?.classList.remove("opacity-100", "pointer-events-auto");
+      currentLightbox.classList.add("opacity-0", "pointer-events-none");
+      currentLightbox.classList.remove("opacity-100", "pointer-events-auto");
       document.body.style.overflow = "";
-      if (img) img.src = "";
+      const currentImg = document.getElementById("lightbox-img") as HTMLImageElement;
+      if (currentImg) currentImg.src = "";
     }
 
-    photoItems.forEach((el, index) => {
-      el.addEventListener("click", (e) => {
+    // Event delegation on document for photo clicks
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      // Check if photo item was clicked
+      const photoItem = target.closest<HTMLElement>("[data-photo-item]");
+      if (photoItem) {
         e.preventDefault();
-        openLightbox(index);
-      });
-    });
+        e.stopPropagation();
+        const allItems = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
+        const idx = allItems.indexOf(photoItem);
+        if (idx !== -1) {
+          openLightbox(idx);
+        }
+        return;
+      }
 
-    closeBtn?.addEventListener("click", closeLightbox);
-    prevBtn?.addEventListener("click", () => renderPhoto(currentIndex - 1));
-    nextBtn?.addEventListener("click", () => renderPhoto(currentIndex + 1));
-
-    lightbox?.addEventListener("click", (e) => {
-      if (e.target === lightbox) {
+      // Check if close button was clicked
+      if (target.closest("#lightbox-close")) {
+        e.preventDefault();
         closeLightbox();
+        return;
+      }
+
+      // Check if previous button was clicked
+      if (target.closest("#lightbox-prev")) {
+        e.preventDefault();
+        renderPhoto(currentIndex - 1);
+        return;
+      }
+
+      // Check if next button was clicked
+      if (target.closest("#lightbox-next")) {
+        e.preventDefault();
+        renderPhoto(currentIndex + 1);
+        return;
+      }
+
+      // Check if background backdrop was clicked
+      if (target.id === "photo-lightbox") {
+        e.preventDefault();
+        closeLightbox();
+        return;
       }
     });
 
     // Keyboard handlers
-    const keyHandler = (e: KeyboardEvent) => {
+    window.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!isOpen) return;
       if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft") renderPhoto(currentIndex - 1);
       if (e.key === "ArrowRight") renderPhoto(currentIndex + 1);
-    };
-
-    window.addEventListener("keydown", keyHandler);
+    });
 
     // Touch swipe support for mobile
     let touchStartX = 0;
     let touchEndX = 0;
 
-    lightbox?.addEventListener("touchstart", (e: TouchEvent) => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
+    document.addEventListener(
+      "touchstart",
+      (e: TouchEvent) => {
+        if (!isOpen) return;
+        touchStartX = e.changedTouches[0].screenX;
+      },
+      { passive: true }
+    );
 
-    lightbox?.addEventListener("touchend", (e: TouchEvent) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
-
-    function handleSwipe() {
-      const swipeDistance = touchEndX - touchStartX;
-      if (Math.abs(swipeDistance) > 50) {
-        if (swipeDistance > 0) {
-          renderPhoto(currentIndex - 1);
-        } else {
-          renderPhoto(currentIndex + 1);
+    document.addEventListener(
+      "touchend",
+      (e: TouchEvent) => {
+        if (!isOpen) return;
+        touchEndX = e.changedTouches[0].screenX;
+        const swipeDistance = touchEndX - touchStartX;
+        if (Math.abs(swipeDistance) > 50) {
+          if (swipeDistance > 0) {
+            renderPhoto(currentIndex - 1);
+          } else {
+            renderPhoto(currentIndex + 1);
+          }
         }
-      }
-    }
+      },
+      { passive: true }
+    );
   }
 
-  document.addEventListener("astro:page-load", setupLightbox);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLightbox);
+  } else {
+    initLightbox();
+  }
+  document.addEventListener("astro:page-load", initLightbox);
 </script>
