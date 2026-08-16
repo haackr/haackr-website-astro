@@ -29,7 +29,11 @@ const PAGE_DESCRIPTION =
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={PAGE_TITLE} description={PAGE_DESCRIPTION} />
+    <BaseHead
+      title={PAGE_TITLE}
+      description={PAGE_DESCRIPTION}
+      image={featuredGallery?.data.coverImage}
+    />
     <ClientRouter />
     <style is:global>
       p {

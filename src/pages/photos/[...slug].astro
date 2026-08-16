@@ -46,7 +46,13 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={PAGE_TITLE} description={description} image={coverImage?.src} />
+    <BaseHead
+      title={PAGE_TITLE}
+      description={description}
+      image={coverImage}
+      type="article"
+      publishedTime={pubDate}
+    />
     <ClientRouter />
     <style is:global>
       p {

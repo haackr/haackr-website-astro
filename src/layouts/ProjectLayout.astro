@@ -24,7 +24,14 @@ const {
 
 <html lang="en">
   <head>
-    <BaseHead title={`${title} | Ryan Haack`} description={description} image={heroImage?.src} />
+    <BaseHead
+      title={`${title} | Ryan Haack`}
+      description={description}
+      image={heroImage}
+      imageAlt={heroImageAlt || title}
+      type="article"
+      publishedTime={pubDate}
+    />
     <ClientRouter />
   </head>
 

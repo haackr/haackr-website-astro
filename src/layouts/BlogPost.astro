@@ -19,9 +19,12 @@ const { title, description, pubDate, updatedDate, heroImage, heroImageAlt } =
     <BaseHead
       title={`${title} | Ryan Haack`}
       description={description}
-      image={heroImage?.src}
+      image={heroImage}
+      imageAlt={heroImageAlt || title}
+      type="article"
+      publishedTime={pubDate}
+      updatedTime={updatedDate}
     />
-    <style is:global></style>
     <ClientRouter />
   </head>
 
