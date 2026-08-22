@@ -26,11 +26,11 @@ if (postProp) {
 }
 ---
 
-<article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group not-prose">
+<article class="flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-slate-950/50 transition-all duration-300 group not-prose">
   {project.data.heroImage && (
     <a
       href={`/projects/${project.id}/`}
-      class="block overflow-hidden aspect-video bg-slate-100 relative"
+      class="block overflow-hidden aspect-video bg-slate-100 dark:bg-slate-800 relative"
     >
       <Image
         src={project.data.heroImage}
@@ -50,20 +50,20 @@ if (postProp) {
 
   <div class="p-6 flex-1 flex flex-col justify-between">
     <div>
-      <div class="flex items-center justify-between gap-2 text-xs text-slate-500 mb-2">
+      <div class="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 mb-2">
         <span class="inline-flex items-center gap-1">
-          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
           <FormattedDate date={project.data.pubDate} />
         </span>
       </div>
 
-      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2">
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors mb-2">
         <a href={`/projects/${project.id}/`}>
           {project.data.title}
         </a>
       </h3>
 
-      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+      <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 mb-4 leading-relaxed">
         {project.data.description}
       </p>
 
@@ -71,7 +71,7 @@ if (postProp) {
       {project.data.tags.length > 0 && (
         <div class="flex flex-wrap gap-1.5 mb-6">
           {project.data.tags.map((tag) => (
-            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-700">
+            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
               {tag}
             </span>
           ))}
@@ -79,10 +79,10 @@ if (postProp) {
       )}
     </div>
 
-    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+    <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
       <a
         href={`/projects/${project.id}/`}
-        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+        class="text-sm font-semibold text-cyan-700 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 inline-flex items-center gap-1 group/link"
       >
         <span>View Details</span>
         <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
@@ -94,7 +94,7 @@ if (postProp) {
             href={project.data.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-slate-500 hover:text-slate-900 transition-colors p-1"
+            class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-1"
             title="View Source Code"
           >
             <Icon name="github" class="w-4 h-4" />
@@ -105,7 +105,7 @@ if (postProp) {
             href={project.data.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-cyan-700 hover:text-cyan-900 transition-colors p-1"
+            class="text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 transition-colors p-1"
             title="Open Live Demo"
           >
             <Icon name="external" class="w-4 h-4" />

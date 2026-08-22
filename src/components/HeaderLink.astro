@@ -20,8 +20,8 @@ const isActive = isHome
   class:list={[
     "text-sm sm:text-base md:text-lg px-2 sm:px-2.5 py-1 transition-colors rounded-md",
     isActive
-      ? "text-cyan-800 font-semibold underline underline-offset-4 decoration-2 decoration-cyan-600"
-      : "text-slate-700 hover:text-slate-900 hover:underline hover:underline-offset-4",
+      ? "text-cyan-800 dark:text-cyan-400 font-semibold underline underline-offset-4 decoration-2 decoration-cyan-600 dark:decoration-cyan-400"
+      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:underline hover:underline-offset-4",
     className,
   ]}
   aria-current={isActive ? "page" : undefined}

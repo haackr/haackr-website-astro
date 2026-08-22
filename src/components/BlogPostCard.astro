@@ -29,11 +29,11 @@ if (postProp) {
 const readingTime = calculateReadingTime(post.body);
 ---
 
-<article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group not-prose">
+<article class="flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-slate-950/50 transition-all duration-300 group not-prose">
   {post.data.heroImage && (
     <a
       href={`/blog/${post.id}/`}
-      class="block overflow-hidden aspect-video bg-slate-100"
+      class="block overflow-hidden aspect-video bg-slate-100 dark:bg-slate-800"
     >
       <Image
         src={post.data.heroImage}
@@ -53,33 +53,33 @@ const readingTime = calculateReadingTime(post.body);
 
   <div class="p-6 flex-1 flex flex-col justify-between">
     <div>
-      <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+      <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
         <span class="inline-flex items-center gap-1.5">
-          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
           <FormattedDate date={post.data.pubDate} />
         </span>
-        <span class="inline-flex items-center gap-1 text-slate-500">
-          <Icon name="clock" class="w-3.5 h-3.5 text-cyan-700" />
+        <span class="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400">
+          <Icon name="clock" class="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
           <span>{readingTime}</span>
         </span>
       </div>
 
 
-      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2 leading-snug">
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors mb-2 leading-snug">
         <a href={`/blog/${post.id}/`}>
           {post.data.title}
         </a>
       </h3>
 
-      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+      <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 mb-4 leading-relaxed">
         {post.data.description}
       </p>
     </div>
 
-    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+    <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
       <a
         href={`/blog/${post.id}/`}
-        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+        class="text-sm font-semibold text-cyan-700 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 inline-flex items-center gap-1 group/link"
       >
         <span>Read Article</span>
         <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>

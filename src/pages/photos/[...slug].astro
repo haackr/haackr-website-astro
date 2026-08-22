@@ -80,6 +80,9 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
       font-size: 1.05rem;
       line-height: 1.75;
     }
+    :global(.dark) .gallery-prose {
+      color: #cbd5e1;
+    }
     .gallery-prose p {
       margin-bottom: 1.5rem;
     }
@@ -140,7 +143,7 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
   <nav class="mb-8">
     <a
       href="/photos/"
-      class="inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium transition-colors"
+      class="inline-flex items-center gap-2 text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 font-medium transition-colors"
     >
       <Icon name="arrow-left" class="w-4 h-4" />
       <span>Back to Photos</span>
@@ -149,33 +152,33 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
 
   <!-- Album Header -->
   <header class="mb-10 max-w-3xl">
-    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
+    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400 mb-3">
       {
         location && (
-          <span class="inline-flex items-center gap-1 text-cyan-800 font-medium bg-cyan-50 border border-cyan-200 px-2.5 py-0.5 rounded-full text-xs">
-            <Icon name="location" class="w-3.5 h-3.5 text-cyan-700" />
+          <span class="inline-flex items-center gap-1 text-cyan-800 dark:text-cyan-300 font-medium bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 px-2.5 py-0.5 rounded-full text-xs">
+            <Icon name="location" class="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
             {location}
           </span>
         )
       }
       <span class="inline-flex items-center gap-1 text-xs">
-        <Icon name="calendar" class="w-3.5 h-3.5 text-slate-400" />
+        <Icon name="calendar" class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
         <FormattedDate date={pubDate} />
       </span>
       <span class="text-xs text-slate-400">·</span>
-      <span class="text-xs text-slate-500">{photos.length} Photographs</span>
+      <span class="text-xs text-slate-500 dark:text-slate-400">{photos.length} Photographs</span>
     </div>
 
-    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
       {title}
     </h1>
 
-    <p class="text-lg text-slate-700 leading-relaxed mb-6">
+    <p class="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
       {description}
     </p>
 
     <!-- Markdown Story/Intro if present -->
-    <div class="gallery-prose border-t border-slate-200 pt-6">
+    <div class="gallery-prose border-t border-slate-200 dark:border-slate-800 pt-6">
       <Content />
     </div>
   </header>
@@ -193,7 +196,7 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
           return (
             <button
               type="button"
-              class="photo-card group relative block overflow-hidden rounded-xl bg-slate-100 border border-slate-200/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+              class="photo-card group relative block overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
               style={{
                 "--ar": roundedAr,
                 aspectRatio: `${photo.src.width} / ${photo.src.height}`,

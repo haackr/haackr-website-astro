@@ -3,6 +3,8 @@
 @import "@fontsource/poppins";
 @plugin "@tailwindcss/typography";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Poppins", sans-serif;
   --font-heading: "Work Sans Variable", sans-serif;
@@ -15,8 +17,9 @@
  */
 
 :root {
-  --accent: #2337ff;
-  --accent-dark: #000d8a;
+  color-scheme: light;
+  --accent: #0284c7;
+  --accent-dark: #0369a1;
   --black: 15, 18, 25;
   --gray: 96, 115, 159;
   --gray-light: 229, 233, 240;
@@ -26,18 +29,38 @@
     0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
 }
 
+html.dark {
+  color-scheme: dark;
+  --accent: #38bdf8;
+  --accent-dark: #7dd3fc;
+  --black: 241, 245, 249;
+  --gray: 148, 163, 184;
+  --gray-light: 30, 41, 59;
+  --gray-dark: 226, 232, 240;
+  --gray-gradient: rgba(30, 41, 59, 60%), #0b0f19;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 40%),
+    0 8px 24px rgba(0, 0, 0, 50%), 0 16px 32px rgba(0, 0, 0, 60%);
+}
+
 body {
   font-family: var(--font-sans);
   margin: 0;
   padding: 0;
   text-align: left;
-  background: linear-gradient(var(--gray-gradient)) no-repeat;
+  background: linear-gradient(var(--gray-gradient)) no-repeat, #ffffff;
   background-size: 100% 600px;
   word-wrap: break-word;
   overflow-wrap: break-word;
   color: rgb(var(--gray-dark));
   font-size: 1rem;
   line-height: 1.7;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  background: linear-gradient(var(--gray-gradient)) no-repeat, #0b0f19;
+  background-size: 100% 600px;
+  color: #e2e8f0;
 }
 
 h1,

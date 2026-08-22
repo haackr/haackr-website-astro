@@ -1,26 +1,30 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 ---
 
 <header class="font-heading">
   <nav class="flex justify-between items-center m-auto max-w-[960px] py-4 px-3 sm:px-4">
-    <a href="/" class="text-xl sm:text-2xl font-bold text-cyan-700 hover:text-slate-900 transition-colors">
+    <a href="/" class="text-xl sm:text-2xl font-bold text-cyan-700 dark:text-cyan-400 hover:text-slate-900 dark:hover:text-white transition-colors">
       Ryan
     </a>
-    <ul class="flex items-center gap-0.5 sm:gap-2">
-      <li>
-        <HeaderLink href="/">Home</HeaderLink>
-      </li>
-      <li>
-        <HeaderLink href="/projects/">Projects</HeaderLink>
-      </li>
-      <li>
-        <HeaderLink href="/blog/">Blog</HeaderLink>
-      </li>
-      <li>
-        <HeaderLink href="/photos/">Photos</HeaderLink>
-      </li>
-    </ul>
+    <div class="flex items-center gap-1 sm:gap-2">
+      <ul class="flex items-center gap-0.5 sm:gap-1.5">
+        <li class="hidden sm:block">
+          <HeaderLink href="/">Home</HeaderLink>
+        </li>
+        <li>
+          <HeaderLink href="/projects/">Projects</HeaderLink>
+        </li>
+        <li>
+          <HeaderLink href="/blog/">Blog</HeaderLink>
+        </li>
+        <li>
+          <HeaderLink href="/photos/">Photos</HeaderLink>
+        </li>
+      </ul>
+      <ThemeToggle />
+    </div>
   </nav>
 </header>
 

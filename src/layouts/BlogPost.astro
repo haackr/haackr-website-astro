@@ -67,7 +67,7 @@ const articleSchema = {
   <nav class="mb-8">
     <a
       href="/blog/"
-      class="inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium transition-colors"
+      class="inline-flex items-center gap-2 text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 font-medium transition-colors"
     >
       <Icon name="arrow-left" class="w-4 h-4" />
       <span>Back to Blog</span>
@@ -75,27 +75,27 @@ const articleSchema = {
   </nav>
 
   <header class="mb-8">
-    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
+    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400 mb-3">
       <span class="inline-flex items-center gap-1.5">
-        <Icon name="calendar" class="w-4 h-4 text-cyan-700" />
+        <Icon name="calendar" class="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
         <FormattedDate date={pubDate} />
       </span>
       {
         updatedDate && (
-          <span class="italic text-xs text-slate-400">
+          <span class="italic text-xs text-slate-400 dark:text-slate-500">
             (Updated: <FormattedDate date={updatedDate} />)
           </span>
         )
       }
       <span class="text-xs text-slate-400">·</span>
-      <span class="inline-flex items-center gap-1.5 text-slate-600">
-        <Icon name="clock" class="w-4 h-4 text-cyan-700" />
+      <span class="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+        <Icon name="clock" class="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
         <span>{readingTime}</span>
       </span>
     </div>
 
     <h1
-      class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight leading-tight"
+      class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight leading-tight"
     >
       {title}
     </h1>
@@ -103,7 +103,7 @@ const articleSchema = {
 
     {
       description && (
-        <p class="text-lg text-slate-700 leading-relaxed mb-6">
+        <p class="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
           {description}
         </p>
       )
@@ -113,7 +113,7 @@ const articleSchema = {
   <!-- Hero Image -->
   {
     heroImage && (
-      <div class="mb-10 overflow-hidden rounded-xl shadow-md border border-slate-200">
+      <div class="mb-10 overflow-hidden rounded-xl shadow-md border border-slate-200 dark:border-slate-800">
         <Image
           src={heroImage}
           alt={heroImageAlt || title}
@@ -132,14 +132,14 @@ const articleSchema = {
     )
   }
 
-  <hr class="border-slate-200 mb-8" />
+  <hr class="border-slate-200 dark:border-slate-800 mb-8" />
 
   <!-- Article Body -->
   <article
-    class="prose prose-slate max-w-none md:prose-lg
+    class="prose prose-slate dark:prose-invert max-w-none md:prose-lg
     prose-headings:font-heading
     prose-p:font-sans
-    prose-a:text-cyan-700 hover:prose-a:text-cyan-900
+    prose-a:text-cyan-700 dark:prose-a:text-cyan-400 hover:prose-a:text-cyan-900 hover:dark:prose-a:text-cyan-300
     prose-img:rounded-xl prose-img:shadow-md prose-img:mx-auto"
   >
     <slot />
