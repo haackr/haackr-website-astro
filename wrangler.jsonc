@@ -10,8 +10,21 @@
 		"binding": "ASSETS"
 	},
 	"workers_dev": false,
-	"route": {
-		"pattern": "haackr.com/*",
-		"zone_name": "haackr.com"
+	"routes": [
+		{
+			"pattern": "haackr.com",
+			"custom_domain": true
+		},
+		{
+			"pattern": "haackr.dev",
+			"custom_domain": true
+		},
+		{
+			"pattern": "ryanhaack.me",
+			"custom_domain": true
+		}
+	],
+	"vars": {
+		"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAEYnifNZ5Z-c_pMR"
 	}
 }
