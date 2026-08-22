@@ -5,7 +5,7 @@ import ContactForm from "../components/ContactForm.astro";
 import LatestPost from "../components/LatestPost.astro";
 import FeaturedProjects from "../components/FeaturedProjects.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
-import me from "../content/images/me.jpg";
+import me from "../content/images/me2.jpeg";
 
 const homeSchema = {
   "@context": "https://schema.org",
@@ -74,11 +74,12 @@ const homeSchema = {
         src={me}
         width={200}
         height={200}
-        quality={85}
+        densities={[1, 2, 3]}
+        quality={90}
         format="webp"
         loading="eager"
         decoding="async"
-        class="rounded-full lg:ml-10 mb-5 lg:mb-0"
+        class="rounded-full lg:ml-10 mb-5 lg:mb-0 w-[200px] h-[200px] object-cover shrink-0"
         alt="Ryan Haack"
       />
       <div>
