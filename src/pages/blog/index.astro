@@ -10,7 +10,7 @@ import { ClientRouter } from "astro:transitions";
 import "../../styles/global.css";
 
 const posts = (
-  await getCollection("blog", ({ data }) => !data.draft)
+  await getCollection("blog", ({ data }) => import.meta.env.DEV || !data.draft)
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const latestPost = posts[0];
