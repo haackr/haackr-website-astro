@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://haackr.com/sitemap-index.html
