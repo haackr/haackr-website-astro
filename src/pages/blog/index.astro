@@ -1,13 +1,8 @@
 ---
-import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
-import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
-import FormattedDate from "../../components/FormattedDate.astro";
-import Icon from "../../components/Icon.astro";
-import { ClientRouter } from "astro:transitions";
-import "../../styles/global.css";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogPostCard from "../../components/BlogPostCard.astro";
+import LatestPost from "../../components/LatestPost.astro";
 
 const posts = (
   await getCollection("blog", ({ data }) => import.meta.env.DEV || !data.draft)
@@ -21,175 +16,39 @@ const PAGE_DESCRIPTION =
   "Articles, technical guides, and thoughts on software engineering, PMIS systems, and web development.";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead
-      title={PAGE_TITLE}
-      description={PAGE_DESCRIPTION}
-      image={latestPost?.data.heroImage}
-    />
-    <ClientRouter />
-    <style is:global>
-      p {
-        font-family: "Poppins", sans-serif;
-      }
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: "Work Sans Variable", sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <Header />
-    <main class="max-w-[960px] m-auto py-12 px-4">
-      <header class="mb-12 text-center sm:text-left">
-        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
-          Blog
-        </h1>
-        <p class="text-md sm:text-xl text-slate-600 max-w-2xl">
-          Articles, technical guides, and thoughts on software engineering, PMIS systems, and development.
-        </p>
-      </header>
+<BaseLayout
+  title={PAGE_TITLE}
+  description={PAGE_DESCRIPTION}
+  image={latestPost?.data.heroImage}
+  mainClass="max-w-[960px] m-auto py-12 px-4"
+>
+  <header class="mb-12 text-center sm:text-left">
+    <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
+      Blog
+    </h1>
+    <p class="text-base sm:text-xl text-slate-600 max-w-2xl">
+      Articles, technical guides, and thoughts on software engineering, PMIS systems, and development.
+    </p>
+  </header>
 
-      <!-- Latest Featured Article -->
-      {
-        latestPost && (
-          <section class="mb-14">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <span>Latest Article</span>
-              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">
-                New
-              </span>
-            </h2>
+  <!-- Latest Featured Article -->
+  <LatestPost />
 
-            <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group grid grid-cols-1 md:grid-cols-12 gap-0">
-              {latestPost.data.heroImage && (
-                <a
-                  href={`/blog/${latestPost.id}/`}
-                  class="block overflow-hidden md:col-span-6 aspect-video md:aspect-auto bg-slate-100"
-                >
-                  <Image
-                    src={latestPost.data.heroImage}
-                    alt={latestPost.data.heroImageAlt || latestPost.data.title}
-                    width={900}
-                    height={500}
-                    quality={82}
-                    format="webp"
-                    widths={[400, 750, 1000]}
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    loading="eager"
-                    fetchpriority="high"
-                    decoding="async"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </a>
-              )}
+  <!-- Other Articles Grid -->
+  {
+    otherPosts.length > 0 && (
+      <section>
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">
+          All Articles
+        </h2>
 
-              <div class={`p-6 sm:p-8 flex flex-col justify-between ${latestPost.data.heroImage ? "md:col-span-6" : "md:col-span-12"}`}>
-                <div>
-                  <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-                    <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
-                    <FormattedDate date={latestPost.data.pubDate} />
-                  </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {otherPosts.map((post) => (
+            <BlogPostCard post={post} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
 
-                  <h3 class="text-2xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-3 leading-snug">
-                    <a href={`/blog/${latestPost.id}/`}>
-                      {latestPost.data.title}
-                    </a>
-                  </h3>
-
-                  <p class="text-slate-600 line-clamp-4 mb-6 leading-relaxed">
-                    {latestPost.data.description}
-                  </p>
-                </div>
-
-                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <a
-                    href={`/blog/${latestPost.id}/`}
-                    class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
-                  >
-                    <span>Read Article</span>
-                    <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
-                  </a>
-                </div>
-              </div>
-            </article>
-          </section>
-        )
-      }
-
-      <!-- Other Articles Grid -->
-      {
-        otherPosts.length > 0 && (
-          <section>
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">
-              All Articles
-            </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {otherPosts.map((post) => (
-                <article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
-                  {post.data.heroImage && (
-                    <a
-                      href={`/blog/${post.id}/`}
-                      class="block overflow-hidden aspect-video bg-slate-100"
-                    >
-                      <Image
-                        src={post.data.heroImage}
-                        alt={post.data.heroImageAlt || post.data.title}
-                        width={720}
-                        height={360}
-                        quality={80}
-                        format="webp"
-                        widths={[360, 720]}
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        loading="lazy"
-                        decoding="async"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </a>
-                  )}
-
-                  <div class="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-                        <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
-                        <FormattedDate date={post.data.pubDate} />
-                      </div>
-
-                      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2 leading-snug">
-                        <a href={`/blog/${post.id}/`}>
-                          {post.data.title}
-                        </a>
-                      </h3>
-
-                      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
-                        {post.data.description}
-                      </p>
-                    </div>
-
-                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <a
-                        href={`/blog/${post.id}/`}
-                        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
-                      >
-                        <span>Read Article</span>
-                        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )
-      }
-    </main>
-    <Footer />
-  </body>
-</html>

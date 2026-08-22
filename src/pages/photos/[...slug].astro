@@ -1,14 +1,10 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import { Image, getImage } from "astro:assets";
-import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import Icon from "../../components/Icon.astro";
 import PhotoLightbox from "../../components/PhotoLightbox.astro";
-import { ClientRouter } from "astro:transitions";
-import "../../styles/global.css";
 
 export async function getStaticPaths() {
   const galleries = await getCollection("galleries", ({ data }) => !data.draft);
@@ -40,206 +36,213 @@ const optimizedPhotos = await Promise.all(
   })
 );
 
+const coverImageSrc =
+  typeof coverImage === "object" && coverImage !== null
+    ? coverImage.src
+    : coverImage;
+
+const gallerySchema = {
+  "@context": "https://schema.org",
+  "@type": "ImageGallery",
+  name: title,
+  description: description,
+  datePublished: pubDate.toISOString(),
+  author: {
+    "@type": "Person",
+    name: "Ryan Haack",
+    url: "https://haackr.com",
+  },
+  ...(location ? { contentLocation: location } : {}),
+  ...(coverImageSrc
+    ? { image: new URL(coverImageSrc, Astro.site).href }
+    : {}),
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": Astro.url.href,
+  },
+};
+
 const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead
-      title={PAGE_TITLE}
-      description={description}
-      image={coverImage}
-      type="article"
-      publishedTime={pubDate}
-    />
-    <ClientRouter />
-    <style is:global>
-      p {
-        font-family: "Poppins", sans-serif;
-      }
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: "Work Sans Variable", sans-serif;
-      }
-      .gallery-prose {
-        color: #475569;
-        font-size: 1.05rem;
-        line-height: 1.75;
-      }
-      .gallery-prose p {
-        margin-bottom: 1.5rem;
+<BaseLayout
+  title={PAGE_TITLE}
+  description={description}
+  image={coverImage}
+  type="article"
+  publishedTime={pubDate}
+  schema={gallerySchema}
+  mainClass="max-w-[1120px] m-auto py-10 px-4"
+>
+  <style>
+    .gallery-prose {
+      color: #475569;
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+    .gallery-prose p {
+      margin-bottom: 1.5rem;
+    }
+
+    /* Mobile: single-column full-width vertical stack */
+    .photo-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .photo-card {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .gallery-last-spacer {
+      display: none;
+    }
+
+    /* Tablet & Desktop: justified flex row layout */
+    @media (min-width: 640px) {
+      :root {
+        --gallery-row-height: 230px;
       }
 
-      /* Mobile: single-column full-width vertical stack */
       .photo-gallery {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.75rem;
       }
 
       .photo-card {
-        width: 100%;
-        min-width: 0;
+        width: auto;
+        flex-grow: var(--ar, 1.5);
+        flex-basis: calc(var(--gallery-row-height, 230px) * var(--ar, 1.5));
       }
 
       .gallery-last-spacer {
-        display: none;
+        display: block;
+        flex-grow: 99999;
+        flex-basis: calc(var(--gallery-row-height, 230px) * 1.5);
+        height: 0;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
       }
+    }
 
-      /* Tablet & Desktop: justified flex row layout */
-      @media (min-width: 640px) {
-        :root {
-          --gallery-row-height: 230px;
-        }
-
-        .photo-gallery {
-          flex-direction: row;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-        }
-
-        .photo-card {
-          width: auto;
-          flex-grow: var(--ar, 1.5);
-          flex-basis: calc(var(--gallery-row-height, 230px) * var(--ar, 1.5));
-        }
-
-        .gallery-last-spacer {
-          display: block;
-          flex-grow: 99999;
-          flex-basis: calc(var(--gallery-row-height, 230px) * 1.5);
-          height: 0;
-          min-height: 0;
-          margin: 0;
-          padding: 0;
-        }
+    @media (min-width: 1024px) {
+      :root {
+        --gallery-row-height: 270px;
       }
+    }
+  </style>
 
-      @media (min-width: 1024px) {
-        :root {
-          --gallery-row-height: 270px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <Header />
-    <main class="max-w-[1120px] m-auto py-10 px-4">
-      <!-- Back Navigation -->
-      <nav class="mb-8">
-        <a
-          href="/photos"
-          class="inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium transition-colors"
-        >
-          <Icon name="arrow-left" class="w-4 h-4" />
-          <span>Back to Photos</span>
-        </a>
-      </nav>
+  <!-- Back Navigation -->
+  <nav class="mb-8">
+    <a
+      href="/photos/"
+      class="inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium transition-colors"
+    >
+      <Icon name="arrow-left" class="w-4 h-4" />
+      <span>Back to Photos</span>
+    </a>
+  </nav>
 
-      <!-- Album Header -->
-      <header class="mb-10 max-w-3xl">
-        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
-          {
-            location && (
-              <span class="inline-flex items-center gap-1 text-cyan-800 font-medium bg-cyan-50 border border-cyan-200 px-2.5 py-0.5 rounded-full text-xs">
-                <Icon name="location" class="w-3.5 h-3.5 text-cyan-700" />
-                {location}
-              </span>
-            )
-          }
-          <span class="inline-flex items-center gap-1 text-xs">
-            <Icon name="calendar" class="w-3.5 h-3.5 text-slate-400" />
-            <FormattedDate date={pubDate} />
+  <!-- Album Header -->
+  <header class="mb-10 max-w-3xl">
+    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
+      {
+        location && (
+          <span class="inline-flex items-center gap-1 text-cyan-800 font-medium bg-cyan-50 border border-cyan-200 px-2.5 py-0.5 rounded-full text-xs">
+            <Icon name="location" class="w-3.5 h-3.5 text-cyan-700" />
+            {location}
           </span>
-          <span class="text-xs text-slate-400">·</span>
-          <span class="text-xs text-slate-500">{photos.length} Photographs</span>
-        </div>
+        )
+      }
+      <span class="inline-flex items-center gap-1 text-xs">
+        <Icon name="calendar" class="w-3.5 h-3.5 text-slate-400" />
+        <FormattedDate date={pubDate} />
+      </span>
+      <span class="text-xs text-slate-400">·</span>
+      <span class="text-xs text-slate-500">{photos.length} Photographs</span>
+    </div>
 
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-          {title}
-        </h1>
+    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+      {title}
+    </h1>
 
-        <p class="text-lg text-slate-700 leading-relaxed mb-6">
-          {description}
-        </p>
+    <p class="text-lg text-slate-700 leading-relaxed mb-6">
+      {description}
+    </p>
 
-        <!-- Markdown Story/Intro if present -->
-        <div class="gallery-prose border-t border-slate-200 pt-6">
-          <Content />
-        </div>
-      </header>
+    <!-- Markdown Story/Intro if present -->
+    <div class="gallery-prose border-t border-slate-200 pt-6">
+      <Content />
+    </div>
+  </header>
 
-      <!-- Photo Gallery Layout -->
-      <section class="mt-8">
-        <div class="photo-gallery">
-          {
-            optimizedPhotos.map((photo, index) => {
-              const ar =
-                photo.src.width && photo.src.height
-                  ? photo.src.width / photo.src.height
-                  : 1.5;
-              const roundedAr = Number(ar.toFixed(4));
-              return (
-                <button
-                  type="button"
-                  class="photo-card group relative block overflow-hidden rounded-xl bg-slate-100 border border-slate-200/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-                  style={{
-                    "--ar": roundedAr,
-                    aspectRatio: `${photo.src.width} / ${photo.src.height}`,
-                    maxWidth: "100%",
-                  }}
-                  data-photo-item
-                  data-photo-src={photo.lightboxSrc}
-                  data-photo-alt={
-                    photo.alt || photo.caption || `${title} photo ${index + 1}`
-                  }
-                  data-photo-caption={photo.caption || ""}
-                  data-photo-location={photo.location || location || ""}
-                  data-photo-camera={photo.camera || ""}
-                  aria-label={`Open photo: ${photo.caption || title}`}
-                >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt || photo.caption || title}
-                    width={600}
-                    quality={80}
-                    format="webp"
-                    widths={[360, 600, 900]}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-                    loading={index < 4 ? "eager" : "lazy"}
-                    decoding="async"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 block"
-                  />
+  <!-- Photo Gallery Layout -->
+  <section class="mt-8">
+    <div class="photo-gallery">
+      {
+        optimizedPhotos.map((photo, index) => {
+          const ar =
+            photo.src.width && photo.src.height
+              ? photo.src.width / photo.src.height
+              : 1.5;
+          const roundedAr = Number(ar.toFixed(4));
+          return (
+            <button
+              type="button"
+              class="photo-card group relative block overflow-hidden rounded-xl bg-slate-100 border border-slate-200/80 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+              style={{
+                "--ar": roundedAr,
+                aspectRatio: `${photo.src.width} / ${photo.src.height}`,
+                maxWidth: "100%",
+              }}
+              data-photo-item
+              data-photo-src={photo.lightboxSrc}
+              data-photo-alt={
+                photo.alt || photo.caption || `${title} photo ${index + 1}`
+              }
+              data-photo-caption={photo.caption || ""}
+              data-photo-location={photo.location || location || ""}
+              data-photo-camera={photo.camera || ""}
+              aria-label={`Open photo: ${photo.caption || title}`}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt || photo.caption || title}
+                width={600}
+                quality={80}
+                format="webp"
+                widths={[360, 600, 900]}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                loading={index < 4 ? "eager" : "lazy"}
+                decoding="async"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 block"
+              />
 
-                  <!-- Hover Overlay with Caption -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 sm:p-4">
-                    {photo.caption && (
-                      <p class="text-white text-sm font-medium line-clamp-2 mb-1">
-                        {photo.caption}
-                      </p>
-                    )}
-                    <div class="flex items-center justify-between text-xs text-slate-300">
-                      <span>{photo.location || location || ""}</span>
-                      <span class="text-cyan-300 font-medium">Click to enlarge</span>
-                    </div>
-                  </div>
-                </button>
-              );
-            })
-          }
-          <!-- Spacer element (only active on desktop rows) -->
-          <div class="gallery-last-spacer pointer-events-none" aria-hidden="true"></div>
-        </div>
-      </section>
+              <!-- Hover Overlay with Caption -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 sm:p-4">
+                {photo.caption && (
+                  <p class="text-white text-sm font-medium line-clamp-2 mb-1">
+                    {photo.caption}
+                  </p>
+                )}
+                <div class="flex items-center justify-between text-xs text-slate-300">
+                  <span>{photo.location || location || ""}</span>
+                  <span class="text-cyan-300 font-medium">Click to enlarge</span>
+                </div>
+              </div>
+            </button>
+          );
+        })
+      }
+      <!-- Spacer element (only active on desktop rows) -->
+      <div class="gallery-last-spacer pointer-events-none" aria-hidden="true"></div>
+    </div>
+  </section>
 
-      <!-- Lightbox Modal -->
-      <PhotoLightbox />
-    </main>
-    <Footer />
-  </body>
-</html>
+  <!-- Lightbox Modal -->
+  <PhotoLightbox />
+</BaseLayout>

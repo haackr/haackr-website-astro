@@ -1,109 +1,148 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import Icon from "../components/Icon.astro";
-import { ClientRouter } from "astro:transitions";
+import { calculateReadingTime } from "../utils/readingTime";
 
-type Props = CollectionEntry<"blog">["data"];
+type Props = CollectionEntry<"blog">["data"] & {
+  body?: string;
+  readingTime?: string;
+};
 
-const { title, description, pubDate, updatedDate, heroImage, heroImageAlt } =
-  Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  heroImageAlt,
+  body,
+  readingTime: readingTimeProp,
+} = Astro.props;
+
+const readingTime = readingTimeProp || calculateReadingTime(body);
+
+const heroImageSrc =
+  typeof heroImage === "object" && heroImage !== null
+    ? heroImage.src
+    : heroImage;
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description: description,
+  datePublished: pubDate.toISOString(),
+  ...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
+  author: {
+    "@type": "Person",
+    name: "Ryan Haack",
+    url: "https://haackr.com",
+  },
+  ...(heroImageSrc
+    ? {
+        image: new URL(heroImageSrc, Astro.site).href,
+      }
+    : {}),
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": Astro.url.href,
+  },
+};
 ---
 
-<html lang="en">
-  <head>
-    <BaseHead
-      title={`${title} | Ryan Haack`}
-      description={description}
-      image={heroImage}
-      imageAlt={heroImageAlt || title}
-      type="article"
-      publishedTime={pubDate}
-      updatedTime={updatedDate}
-    />
-    <ClientRouter />
-  </head>
+<BaseLayout
+  title={`${title} | Ryan Haack`}
+  description={description}
+  image={heroImage}
+  imageAlt={heroImageAlt || title}
+  type="article"
+  publishedTime={pubDate}
+  updatedTime={updatedDate}
+  schema={articleSchema}
+  mainClass="max-w-[900px] m-auto py-8 px-4"
+>
+  <nav class="mb-8">
+    <a
+      href="/blog/"
+      class="inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium transition-colors"
+    >
+      <Icon name="arrow-left" class="w-4 h-4" />
+      <span>Back to Blog</span>
+    </a>
+  </nav>
 
-  <body>
-    <Header />
-    <main class="max-w-[900px] m-auto py-8 px-4">
-      <nav class="mb-8">
-        <a
-          href="/blog"
-          class="inline-flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium transition-colors"
-        >
-          <Icon name="arrow-left" class="w-4 h-4" />
-          <span>Back to Blog</span>
-        </a>
-      </nav>
-
-      <header class="mb-8">
-        <div class="flex items-center gap-3 text-sm text-slate-500 mb-3">
-          <span class="inline-flex items-center gap-1.5">
-            <Icon name="calendar" class="w-4 h-4 text-cyan-700" />
-            <FormattedDate date={pubDate} />
-          </span>
-          {
-            updatedDate && (
-              <span class="italic text-xs text-slate-400">
-                (Updated: <FormattedDate date={updatedDate} />)
-              </span>
-            )
-          }
-        </div>
-
-        <h1
-          class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight leading-tight"
-        >
-          {title}
-        </h1>
-
-        {
-          description && (
-            <p class="text-lg text-slate-700 leading-relaxed mb-6">
-              {description}
-            </p>
-          )
-        }
-      </header>
-
-      <!-- Hero Image -->
+  <header class="mb-8">
+    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
+      <span class="inline-flex items-center gap-1.5">
+        <Icon name="calendar" class="w-4 h-4 text-cyan-700" />
+        <FormattedDate date={pubDate} />
+      </span>
       {
-        heroImage && (
-          <div class="mb-10 overflow-hidden rounded-xl shadow-md border border-slate-200">
-            <Image
-              src={heroImage}
-              alt={heroImageAlt || title}
-              width={1200}
-              height={600}
-              quality={85}
-              format="webp"
-              widths={[400, 800, 1200]}
-              sizes="(max-width: 900px) 100vw, 900px"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              class="w-full h-auto object-cover"
-            />
-          </div>
+        updatedDate && (
+          <span class="italic text-xs text-slate-400">
+            (Updated: <FormattedDate date={updatedDate} />)
+          </span>
         )
       }
+      <span class="text-xs text-slate-400">·</span>
+      <span class="inline-flex items-center gap-1.5 text-slate-600">
+        <Icon name="clock" class="w-4 h-4 text-cyan-700" />
+        <span>{readingTime}</span>
+      </span>
+    </div>
 
-      <hr class="border-slate-200 mb-8" />
+    <h1
+      class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight leading-tight"
+    >
+      {title}
+    </h1>
 
-      <!-- Article Body -->
-      <article class="prose prose-slate max-w-none md:prose-lg
-        prose-headings:font-['Work_Sans_Variable',sans-serif]
-        prose-p:font-['Poppins',sans-serif]
-        prose-a:text-cyan-700 hover:prose-a:text-cyan-900
-        prose-img:rounded-xl prose-img:shadow-md prose-img:mx-auto">
-        <slot />
-      </article>
-    </main>
-    <Footer />
-  </body>
-</html>
+
+    {
+      description && (
+        <p class="text-lg text-slate-700 leading-relaxed mb-6">
+          {description}
+        </p>
+      )
+    }
+  </header>
+
+  <!-- Hero Image -->
+  {
+    heroImage && (
+      <div class="mb-10 overflow-hidden rounded-xl shadow-md border border-slate-200">
+        <Image
+          src={heroImage}
+          alt={heroImageAlt || title}
+          width={1200}
+          height={600}
+          quality={85}
+          format="webp"
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 900px) 100vw, 900px"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="w-full h-auto object-cover"
+        />
+      </div>
+    )
+  }
+
+  <hr class="border-slate-200 mb-8" />
+
+  <!-- Article Body -->
+  <article
+    class="prose prose-slate max-w-none md:prose-lg
+    prose-headings:font-heading
+    prose-p:font-sans
+    prose-a:text-cyan-700 hover:prose-a:text-cyan-900
+    prose-img:rounded-xl prose-img:shadow-md prose-img:mx-auto"
+  >
+    <slot />
+  </article>
+</BaseLayout>
+

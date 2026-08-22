@@ -1,0 +1,90 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+import Icon from "./Icon.astro";
+import { calculateReadingTime } from "../utils/readingTime";
+
+const posts = (
+  await getCollection("blog", ({ data }) => import.meta.env.DEV || !data.draft)
+).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const latestPost = posts[0];
+const readingTime = latestPost ? calculateReadingTime(latestPost.body) : "";
+---
+
+{
+  latestPost && (
+    <section>
+      <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <span>Latest Article</span>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">
+          New
+        </span>
+      </h2>
+
+      <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group grid grid-cols-1 md:grid-cols-12 gap-0">
+        {latestPost.data.heroImage && (
+          <a
+            href={`/blog/${latestPost.id}/`}
+            class="block overflow-hidden md:col-span-6 aspect-video md:aspect-auto bg-slate-100"
+          >
+            <Image
+              src={latestPost.data.heroImage}
+              alt={latestPost.data.heroImageAlt || latestPost.data.title}
+              width={900}
+              height={500}
+              quality={82}
+              format="webp"
+              widths={[400, 750, 1000]}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          </a>
+        )}
+
+        <div
+          class={`p-6 sm:p-8 flex flex-col justify-between ${latestPost.data.heroImage ? "md:col-span-6" : "md:col-span-12"}`}
+        >
+          <div>
+            <div class="flex items-center gap-3 text-xs text-slate-500 mb-3">
+              <span class="inline-flex items-center gap-1.5">
+                <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+                <FormattedDate date={latestPost.data.pubDate} />
+              </span>
+              <span class="text-xs text-slate-400">·</span>
+              <span class="inline-flex items-center gap-1.5 text-slate-600">
+                <Icon name="clock" class="w-3.5 h-3.5 text-cyan-700" />
+                <span>{readingTime}</span>
+              </span>
+            </div>
+
+
+            <h3 class="text-2xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-3 leading-snug">
+              <a href={`/blog/${latestPost.id}/`}>{latestPost.data.title}</a>
+            </h3>
+
+            <p class="text-slate-600 line-clamp-4 mb-6 leading-relaxed">
+              {latestPost.data.description}
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <a
+              href={`/blog/${latestPost.id}/`}
+              class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+            >
+              <span>Read Article</span>
+              <span class="group-hover/link:translate-x-0.5 transition-transform">
+                →
+              </span>
+            </a>
+          </div>
+        </div>
+      </article>
+    </section>
+  )
+}

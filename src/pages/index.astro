@@ -1,113 +1,143 @@
 ---
 import { Image } from "astro:assets";
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import ContactForm from "../components/ContactForm.astro";
+import LatestPost from "../components/LatestPost.astro";
+import FeaturedProjects from "../components/FeaturedProjects.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
-import { ClientRouter } from "astro:transitions";
 import me from "../content/images/me.jpg";
-import "../styles/global.css";
+
+const homeSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://haackr.com/#website",
+      url: "https://haackr.com",
+      name: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+    },
+    {
+      "@type": "Person",
+      "@id": "https://haackr.com/#person",
+      name: "Ryan Haack",
+      url: "https://haackr.com",
+      jobTitle: "Lead Senior Consultant & Software Developer",
+      worksFor: {
+        "@type": "Organization",
+        name: "Avicado",
+        url: "https://avicado.com",
+      },
+      sameAs: [
+        "https://github.com/haackr",
+        "https://www.linkedin.com/in/haackr/",
+        "https://www.strava.com/athletes/ryan_haack",
+        "https://www.instagram.com/haackr_505/",
+        "https://www.youtube.com/@haackr",
+      ],
+    },
+  ],
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead
-      title={SITE_TITLE}
-      description={SITE_DESCRIPTION}
-      image={me}
-    />
-    <ClientRouter />
-    <style is:global>
-      p {
-        font-family: "Poppins", sans-serif;
-      }
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: "Work Sans Variable", sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <Header title={SITE_TITLE} />
-    <main class="w-full">
-      <header>
-        <div class="h-[50vh] flex max-w-[960px] m-auto p-4">
-          <div>
-            <h1 class="mt-[25vh] text-2xl sm:text-4xl">
-              Hi, I'm <span class="text-cyan-600 underline underline-offset-6"
-                >Ryan.</span
-              >
-              <br />
-              I'm a <span class="text-cyan-800"><span id="typed-output"></span></span>
-            </h1>
-          </div>
-        </div>
-        <article>
-          <div class="max-w-[960px] p-4 m-auto pb-10">
-            <h2 class="text-2xl sm:text-3xl text-center mb-5 font-extrabold">About Me</h2>
-            <div class="flex flex-col items-center lg:flex-row-reverse">
-              <Image
-                src={me}
-                width={200}
-                height={200}
-                quality={85}
-                format="webp"
-                loading="eager"
-                decoding="async"
-                class="rounded-full lg:ml-10 mb-5 lg:mb-0"
-                alt="Ryan Haack"
-              />
-              <div>
-                <p class="text-l sm:text-xl text-slate-800 mb-3">
-                  I'm a software developer and PMIS consultant from Albuquerque, New Mexico. I'm currently working as a Lead Senior Consultant at <a href="https://avicado.com">Avicado</a> and pursuing my master's in computer science at CU Boulder.
-                </p>
-                <p class="text-l sm:text-xl text-slate-800 mb-3">
-                  Day-to-day, my work centers around modernizing project management systems, developing custom software tools, and improving data visibility for teams. In my free time, I enjoy spending time outdoors running, hiking, and camping.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="py-20">
-            <h2 class="text-2xl sm:text-3xl text-center mb-5 font-extrabold">Contact Me</h2>
-            <ContactForm />
-          </div>
-        </article>
-        <Footer />
-      </header>
-    </main>
+<BaseLayout
+  title={SITE_TITLE}
+  description={SITE_DESCRIPTION}
+  image={me}
+  schema={homeSchema}
+>
+  <section class="h-[50vh] flex max-w-[960px] m-auto p-4">
+    <div>
+      <h1 class="mt-[25vh] text-2xl sm:text-4xl">
+        Hi, I'm <span class="text-cyan-600 underline underline-offset-6">Ryan.</span>
+        <br />
+        I'm a <span class="text-cyan-800"><span id="typed-output">software developer.</span></span>
+      </h1>
+    </div>
+  </section>
 
-    <script>
-      import Typed from "typed.js";
+  <section class="max-w-[960px] p-4 m-auto pb-10">
+    <h2 class="text-2xl sm:text-3xl text-center mb-5 font-extrabold">About Me</h2>
+    <div class="flex flex-col items-center lg:flex-row-reverse">
+      <Image
+        src={me}
+        width={200}
+        height={200}
+        quality={85}
+        format="webp"
+        loading="eager"
+        decoding="async"
+        class="rounded-full lg:ml-10 mb-5 lg:mb-0"
+        alt="Ryan Haack"
+      />
+      <div>
+        <p class="text-lg sm:text-xl text-slate-800 mb-3">
+          I'm a software developer and PMIS consultant from Albuquerque, New Mexico. I'm currently working as a Lead Senior Consultant at <a href="https://avicado.com" class="text-cyan-700 hover:text-cyan-900 underline">Avicado</a> and pursuing my master's in computer science at CU Boulder.
+        </p>
+        <p class="text-lg sm:text-xl text-slate-800 mb-3">
+          Day-to-day, my work centers around modernizing project management systems, developing custom software tools, and improving data visibility for teams. In my free time, I enjoy spending time outdoors running, hiking, and camping.
+        </p>
+      </div>
+    </div>
+  </section>
 
-      function initTyped() {
-        const el = document.getElementById("typed-output");
-        if (!el) return;
-        return new Typed(el, {
-          strings: [
-            "PMIS Consultant.",
-            "runner.",
-            "software developer.",
-            "grad student.",
-            "photographer.",
-          ],
-          typeSpeed: 50,
-          backSpeed: 30,
-          cursorChar: "|",
-          loop: true,
-        });
-      }
+  <section class="max-w-[960px] p-4 m-auto py-20">
+    <LatestPost />
+    <div class="mt-6 text-center">
+      <a
+        href="/blog/"
+        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+      >
+        <span>View all articles</span>
+        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+      </a>
+    </div>
+  </section>
 
-      let typedInstance: Typed | undefined;
-      document.addEventListener("astro:page-load", () => {
-        typedInstance?.destroy();
-        typedInstance = initTyped();
+  <section class="max-w-[960px] p-4 m-auto py-20">
+    <FeaturedProjects />
+    <div class="mt-6 text-center">
+      <a
+        href="/projects/"
+        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+      >
+        <span>View all projects</span>
+        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="py-20">
+    <h2 class="text-2xl sm:text-3xl text-center mb-5 font-extrabold">Contact Me</h2>
+    <ContactForm />
+  </section>
+
+  <script>
+    import Typed from "typed.js";
+
+    function initTyped() {
+      const el = document.getElementById("typed-output");
+      if (!el) return;
+      return new Typed(el, {
+        strings: [
+          "PMIS Consultant.",
+          "runner.",
+          "software developer.",
+          "grad student.",
+          "photographer.",
+        ],
+        typeSpeed: 50,
+        backSpeed: 30,
+        cursorChar: "|",
+        loop: true,
       });
-    </script>
-  </body>
-</html>
+    }
+
+    let typedInstance: Typed | undefined;
+    document.addEventListener("astro:page-load", () => {
+      typedInstance?.destroy();
+      typedInstance = initTyped();
+    });
+  </script>
+</BaseLayout>
+

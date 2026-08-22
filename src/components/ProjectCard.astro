@@ -1,0 +1,117 @@
+---
+import { Image } from "astro:assets";
+import { type CollectionEntry, getEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+import Icon from "./Icon.astro";
+
+interface Props {
+  slug?: string;
+  post?: CollectionEntry<"projects">;
+}
+
+const { slug, post: postProp } = Astro.props;
+
+let project: CollectionEntry<"projects">;
+
+if (postProp) {
+  project = postProp;
+} else if (slug) {
+  const entry = await getEntry("projects", slug);
+  if (!entry) {
+    throw new Error(`Project not found: "${slug}"`);
+  }
+  project = entry;
+} else {
+  throw new Error("ProjectCard requires either a `slug` or `post` prop.");
+}
+---
+
+<article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group not-prose">
+  {project.data.heroImage && (
+    <a
+      href={`/projects/${project.id}/`}
+      class="block overflow-hidden aspect-video bg-slate-100 relative"
+    >
+      <Image
+        src={project.data.heroImage}
+        alt={project.data.heroImageAlt || project.data.title}
+        width={800}
+        height={450}
+        quality={80}
+        format="webp"
+        widths={[400, 800]}
+        sizes="(max-width: 768px) 100vw, 50vw"
+        loading="lazy"
+        decoding="async"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+    </a>
+  )}
+
+  <div class="p-6 flex-1 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between gap-2 text-xs text-slate-500 mb-2">
+        <span class="inline-flex items-center gap-1">
+          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+          <FormattedDate date={project.data.pubDate} />
+        </span>
+      </div>
+
+      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2">
+        <a href={`/projects/${project.id}/`}>
+          {project.data.title}
+        </a>
+      </h3>
+
+      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+        {project.data.description}
+      </p>
+
+      <!-- Tags -->
+      {project.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-1.5 mb-6">
+          {project.data.tags.map((tag) => (
+            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-700">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+      <a
+        href={`/projects/${project.id}/`}
+        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+      >
+        <span>View Details</span>
+        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+      </a>
+
+      <div class="flex items-center gap-3">
+        {project.data.repoUrl && (
+          <a
+            href={project.data.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-slate-500 hover:text-slate-900 transition-colors p-1"
+            title="View Source Code"
+          >
+            <Icon name="github" class="w-4 h-4" />
+          </a>
+        )}
+        {project.data.liveUrl && (
+          <a
+            href={project.data.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-cyan-700 hover:text-cyan-900 transition-colors p-1"
+            title="Open Live Demo"
+          >
+            <Icon name="external" class="w-4 h-4" />
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</article>

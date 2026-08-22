@@ -32,17 +32,20 @@ const SOCIAL_LINKS = [
 const { c } = Astro.props;
 ---
 
-<footer
-  class={"text-cyan-900 " + c}
-  style="font-family: 'Poppins', sans-serif;"
->
+<footer class:list={["text-cyan-900", c]}>
   <div class="py-8">
     <div class="mb-4">
       <ul class="flex text-center justify-center gap-3">
         {
           SOCIAL_LINKS.map(({ title, link, icon }) => (
             <li>
-          <a href={link} title={title} aria-label={title} class="">
+              <a
+                href={link}
+                title={title}
+                aria-label={title}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Icon
                   name={icon}
                   class="h-6 w-6 text-cyan-900 hover:text-cyan-800"
@@ -54,7 +57,11 @@ const { c } = Astro.props;
       </ul>
     </div>
     <p class="text-cyan-900">
-      Made with ❤ by me using <a href="https://astro.build/" aria-label="Astro"
+      Made with ❤ by me using <a
+        href="https://astro.build/"
+        aria-label="Astro"
+        target="_blank"
+        rel="noopener noreferrer"
         ><Icon
           class="h-6 w-6 inline hover:text-cyan-800"
           name="astro"
@@ -70,3 +77,4 @@ const { c } = Astro.props;
     text-align: center;
   }
 </style>
+

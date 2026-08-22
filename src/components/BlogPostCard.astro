@@ -1,0 +1,89 @@
+---
+import { Image } from "astro:assets";
+import { type CollectionEntry, getEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+import Icon from "./Icon.astro";
+import { calculateReadingTime } from "../utils/readingTime";
+
+interface Props {
+  slug?: string;
+  post?: CollectionEntry<"blog">;
+}
+
+const { slug, post: postProp } = Astro.props;
+
+let post: CollectionEntry<"blog">;
+
+if (postProp) {
+  post = postProp;
+} else if (slug) {
+  const entry = await getEntry("blog", slug);
+  if (!entry) {
+    throw new Error(`Blog post not found: "${slug}"`);
+  }
+  post = entry;
+} else {
+  throw new Error("BlogPostCard requires either a `slug` or `post` prop.");
+}
+
+const readingTime = calculateReadingTime(post.body);
+---
+
+<article class="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group not-prose">
+  {post.data.heroImage && (
+    <a
+      href={`/blog/${post.id}/`}
+      class="block overflow-hidden aspect-video bg-slate-100"
+    >
+      <Image
+        src={post.data.heroImage}
+        alt={post.data.heroImageAlt || post.data.title}
+        width={720}
+        height={360}
+        quality={80}
+        format="webp"
+        widths={[360, 720]}
+        sizes="(max-width: 768px) 100vw, 50vw"
+        loading="lazy"
+        decoding="async"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+    </a>
+  )}
+
+  <div class="p-6 flex-1 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+        <span class="inline-flex items-center gap-1.5">
+          <Icon name="calendar" class="w-3.5 h-3.5 text-cyan-700" />
+          <FormattedDate date={post.data.pubDate} />
+        </span>
+        <span class="inline-flex items-center gap-1 text-slate-500">
+          <Icon name="clock" class="w-3.5 h-3.5 text-cyan-700" />
+          <span>{readingTime}</span>
+        </span>
+      </div>
+
+
+      <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-700 transition-colors mb-2 leading-snug">
+        <a href={`/blog/${post.id}/`}>
+          {post.data.title}
+        </a>
+      </h3>
+
+      <p class="text-sm text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+        {post.data.description}
+      </p>
+    </div>
+
+    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+      <a
+        href={`/blog/${post.id}/`}
+        class="text-sm font-semibold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1 group/link"
+      >
+        <span>Read Article</span>
+        <span class="group-hover/link:translate-x-0.5 transition-transform">→</span>
+      </a>
+    </div>
+  </div>
+</article>

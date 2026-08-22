@@ -1,0 +1,32 @@
+---
+import { getCollection } from "astro:content";
+import ProjectCard from "./ProjectCard.astro";
+
+const featuredProjects = (
+  await getCollection("projects", ({ data }) => !data.draft && data.featured)
+).sort((a, b) => {
+  if (a.data.order !== b.data.order) {
+    return a.data.order - b.data.order;
+  }
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+---
+
+{
+  featuredProjects.length > 0 && (
+    <section>
+      <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <span>Featured Work</span>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">
+          Spotlight
+        </span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {featuredProjects.map((project) => (
+          <ProjectCard post={project} />
+        ))}
+      </div>
+    </section>
+  )
+}

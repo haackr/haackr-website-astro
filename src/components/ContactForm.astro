@@ -1,57 +1,80 @@
 ---
+// Site key can be set in environment variables or defaults to Cloudflare's always-pass testing key
+const TURNSTILE_SITE_KEY =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 ---
 
-<style>
-  label input,
-  textarea {
-    font-family: "Poppins", sans-serif;
-  }
-</style>
 <form
   id="contact-form"
   class="max-w-[700px] m-auto p-4"
   name="contact"
-  style={`font-family: "Poppins", sans-serif;`}
 >
+  <!-- Honeypot anti-spam field (hidden from human visitors) -->
+  <div class="hidden" aria-hidden="true" style="display:none !important;">
+    <label for="contact-website-field">Leave this empty</label>
+    <input
+      type="text"
+      id="contact-website-field"
+      name="_gotcha"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+
   <div class="mb-6">
+    <label for="name" class="block text-sm font-medium text-slate-700 mb-1.5">Name</label>
     <input
       type="text"
       id="name"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 transition-colors"
       placeholder="Your Name"
       required
       name="name"
     />
   </div>
+
   <div class="mb-6">
+    <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
     <input
       type="email"
       id="email"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 transition-colors"
       placeholder="your@email.com"
       required
       name="email"
     />
   </div>
+
   <div class="mb-6">
+    <label for="message" class="block text-sm font-medium text-slate-700 mb-1.5">Message</label>
     <textarea
       id="message"
       rows="4"
-      class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      class="block p-2.5 w-full text-sm text-slate-900 bg-slate-50 rounded-lg border border-slate-300 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
       placeholder="Send me a message..."
       name="message"
       required></textarea>
   </div>
+
+  <!-- Cloudflare Turnstile Verification -->
+  <div class="mb-6">
+    <div
+      id="turnstile-container"
+      data-sitekey={TURNSTILE_SITE_KEY}
+    ></div>
+  </div>
+
   <button
     id="submit-btn"
     type="submit"
-    class="text-slate-100 bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
-    >Submit</button
+    class="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm w-full sm:w-auto px-6 py-2.5 text-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
   >
+    Send Message
+  </button>
 </form>
 
-<div 
-  id="toast" 
+<div
+  id="toast"
   class="fixed bottom-5 right-5 z-50 transform translate-y-12 opacity-0 transition-all duration-300 ease-out pointer-events-none"
   role="alert"
 >
@@ -61,68 +84,143 @@
   </div>
 </div>
 
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
 <script>
-  const form = document.getElementById('contact-form') as HTMLFormElement;
-  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-  
-  // Toast Elements
-  const toast = document.getElementById('toast');
-  const toastContent = document.getElementById('toast-content');
-  const toastIcon = document.getElementById('toast-icon');
-  const toastMessage = document.getElementById('toast-message');
-  
-  let toastTimeout: ReturnType<typeof setTimeout>;
-
-  const showToast = (message: string, type: 'success' | 'error') => {
-    clearTimeout(toastTimeout);
-    
-    if (type === 'success') {
-      toastContent!.className = 'flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl border bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300 pointer-events-auto';
-      toastIcon!.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>';
-    } else {
-      toastContent!.className = 'flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl border bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-950 dark:border-rose-800 dark:text-rose-300 pointer-events-auto';
-      toastIcon!.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>';
-    }
-
-    toastMessage!.textContent = message;
-
-    // Slide in
-    toast!.classList.remove('translate-y-12', 'opacity-0');
-    toast!.classList.add('translate-y-0', 'opacity-100');
-
-    // Slide out after 4 seconds
-    toastTimeout = setTimeout(() => {
-      toast!.classList.remove('translate-y-0', 'opacity-100');
-      toast!.classList.add('translate-y-12', 'opacity-0');
-    }, 4000);
-  };
-
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-
-    try {
-      const formData = new FormData(form);
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        body: formData, 
-      });
-
-      const result = (await response.json()) as { error?: string };
-
-      if (response.ok) {
-        showToast('Message sent successfully!', 'success');
-        form.reset();
-      } else {
-        showToast(`Error: ${result?.error ?? 'Unknown error'}`, 'error');
+  interface TurnstileApi {
+    render: (
+      container: string | HTMLElement,
+      options: {
+        sitekey: string;
+        theme?: "light" | "dark" | "auto";
+        callback?: (token: string) => void;
       }
-    } catch (error) {
-      console.error('Submission failed', error);
-      showToast('Something went wrong. Please try again later.', 'error');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Message';
+    ) => string;
+    reset: (widgetId?: string) => void;
+    remove: (widgetId?: string) => void;
+  }
+
+  declare global {
+    interface Window {
+      turnstile?: TurnstileApi;
     }
+  }
+
+  let turnstileWidgetId: string | undefined;
+
+  function initTurnstile() {
+    const container = document.getElementById("turnstile-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    const sitekey = container.dataset.sitekey || "1x00000000000000000000AA";
+
+    if (window.turnstile) {
+      try {
+        turnstileWidgetId = window.turnstile.render(container, {
+          sitekey: sitekey,
+          theme: "auto",
+        });
+      } catch (err) {
+        console.error("Turnstile render error:", err);
+      }
+    } else {
+      const checkInterval = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(checkInterval);
+          try {
+            turnstileWidgetId = window.turnstile.render(container, {
+              sitekey: sitekey,
+              theme: "auto",
+            });
+          } catch (err) {
+            console.error("Turnstile render error:", err);
+          }
+        }
+      }, 100);
+      setTimeout(() => clearInterval(checkInterval), 5000);
+    }
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    initTurnstile();
+
+    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement | null;
+    const toast = document.getElementById("toast");
+    const toastContent = document.getElementById("toast-content");
+    const toastIcon = document.getElementById("toast-icon");
+    const toastMessage = document.getElementById("toast-message");
+
+    if (!form || !submitBtn || !toast || !toastContent || !toastIcon || !toastMessage) {
+      return;
+    }
+
+    let toastTimeout: ReturnType<typeof setTimeout>;
+
+    const showToast = (message: string, type: "success" | "error") => {
+      clearTimeout(toastTimeout);
+
+      if (type === "success") {
+        toastContent.className =
+          "flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl border bg-emerald-50 border-emerald-200 text-emerald-800 pointer-events-auto";
+        toastIcon.innerHTML =
+          '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>';
+      } else {
+        toastContent.className =
+          "flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl border bg-rose-50 border-rose-200 text-rose-800 pointer-events-auto";
+        toastIcon.innerHTML =
+          '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>';
+      }
+
+      toastMessage.textContent = message;
+
+      toast.classList.remove("translate-y-12", "opacity-0");
+      toast.classList.add("translate-y-0", "opacity-100");
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-12", "opacity-0");
+      }, 4000);
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = (await response.json()) as { error?: string; success?: boolean };
+
+        if (response.ok && result.success !== false) {
+          showToast("Message sent successfully!", "success");
+          form.reset();
+          if (window.turnstile && turnstileWidgetId) {
+            window.turnstile.reset(turnstileWidgetId);
+          }
+        } else {
+          showToast(`Error: ${result?.error ?? "Unknown error"}`, "error");
+          if (window.turnstile && turnstileWidgetId) {
+            window.turnstile.reset(turnstileWidgetId);
+          }
+        }
+      } catch (error) {
+        console.error("Submission failed", error);
+        showToast("Something went wrong. Please try again later.", "error");
+        if (window.turnstile && turnstileWidgetId) {
+          window.turnstile.reset(turnstileWidgetId);
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send Message";
+      }
+    });
   });
 </script>
+

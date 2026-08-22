@@ -1,71 +1,52 @@
 ---
-import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
-import "../../styles/global.css";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const SITE_TITLE = "Just The Temperature | Privacy Policy";
-const SITE_DESCRIPTION = SITE_TITLE;
+const PAGE_TITLE = "Just The Temperature | Privacy Policy";
+const PAGE_DESCRIPTION = "Privacy Policy for Just The Temperature Alexa skill.";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <style is:global>
-      p {
-        font-family: "Poppins", sans-serif;
-      }
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: "Work Sans Variable", sans-serif;
-      }
-    </style>
-  </head>
-  <html>
-    <body class="h-screen">
-      <Header title={SITE_TITLE} />
-      <main class="py-20">
-        <div class="max-w-2xl m-auto flex flex-col items-center justify-center">
-          <div>
-            <h1 class="text-4xl mb-4">Just The Temperature Privacy Policy</h1>
-            <h2 class="text-2xl my-3">Introduction</h2>
-            <p>
-              This document will describe the kind of information we collect and
-              how it is used.
-            </p>
-            <h2 class="text-2xl my-3">What information we collect</h2>
-            <p>
-              We collect either your postal code and ISO 3166-1 alpha-2 country
-              code or your lattitude and longitude as provided by your device in
-              order to get information about your local weather. This
-              information is only gathered if you have granted the skill
-              permissions to use your location in the alexa app.{" "}
-              <strong>
-                We do not intentionally retain any of the information gathered
-                about your location or local weather
-              </strong>
-               .
-            </p>
-            <h2 class="text-2xl my-3">Third Party Providers</h2>
-            <p>
-              We use the openweathermap.org API to get your local weather. Your
-              location is sent to them in the clear. Please refer to{" "}
-              <a href="https://openweather.co.uk/privacy-policy">
-                openweathermap.org's privacy policy
-              </a>{" "}
-               for more information about how they might use the information we
-              send to them.
-            </p>
-            <p class="mt-3">Policy Effective 07/07/2020</p>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </body>
-  </html>
-</html>
+<BaseLayout
+  title={PAGE_TITLE}
+  description={PAGE_DESCRIPTION}
+  mainClass="py-20"
+>
+  <div class="max-w-2xl m-auto p-4 flex flex-col items-center justify-center">
+    <div>
+      <h1 class="text-4xl mb-4">Just The Temperature Privacy Policy</h1>
+      <h2 class="text-2xl my-3">Introduction</h2>
+      <p>
+        This document will describe the kind of information we collect and
+        how it is used.
+      </p>
+      <h2 class="text-2xl my-3">What information we collect</h2>
+      <p>
+        We collect either your postal code and ISO 3166-1 alpha-2 country
+        code or your latitude and longitude as provided by your device in
+        order to get information about your local weather. This
+        information is only gathered if you have granted the skill
+        permissions to use your location in the Alexa app.{" "}
+        <strong>
+          We do not intentionally retain any of the information gathered
+          about your location or local weather.
+        </strong>
+      </p>
+      <h2 class="text-2xl my-3">Third Party Providers</h2>
+      <p>
+        We use the openweathermap.org API to get your local weather. Your
+        location is sent to them in the clear. Please refer to{" "}
+        <a
+          href="https://openweather.co.uk/privacy-policy"
+          class="text-cyan-700 hover:text-cyan-900 underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          openweathermap.org's privacy policy
+        </a>{" "}
+        for more information about how they might use the information we
+        send to them.
+      </p>
+      <p class="mt-3 text-sm text-slate-500">Policy Effective 07/07/2020</p>
+    </div>
+  </div>
+</BaseLayout>
+
