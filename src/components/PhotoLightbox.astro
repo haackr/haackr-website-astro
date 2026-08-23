@@ -1,17 +1,38 @@
 ---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
 import Icon from "./Icon.astro";
+
+interface PhotoItem {
+  src: ImageMetadata;
+  alt?: string;
+  caption?: string;
+  location?: string;
+  camera?: string;
+}
+
+interface Props {
+  photos: PhotoItem[];
+  title?: string;
+  defaultLocation?: string;
+}
+
+const { photos = [], title = "Photo Gallery", defaultLocation = "" } = Astro.props;
 ---
 
 <div
   id="photo-lightbox"
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/95 opacity-0 transition-opacity duration-300 backdrop-blur-md"
   role="dialog"
   aria-modal="true"
-  aria-label="Photo Lightbox"
+  aria-hidden="true"
+  aria-label={`${title} Lightbox`}
+  data-total-photos={photos.length}
 >
   <!-- Close Button -->
   <button
     id="lightbox-close"
+    type="button"
     class="absolute top-4 right-4 z-50 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
     aria-label="Close Lightbox"
   >
@@ -21,6 +42,7 @@ import Icon from "./Icon.astro";
   <!-- Previous Button -->
   <button
     id="lightbox-prev"
+    type="button"
     class="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
     aria-label="Previous Photo"
   >
@@ -30,6 +52,7 @@ import Icon from "./Icon.astro";
   <!-- Next Button -->
   <button
     id="lightbox-next"
+    type="button"
     class="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
     aria-label="Next Photo"
   >
@@ -37,24 +60,50 @@ import Icon from "./Icon.astro";
   </button>
 
   <!-- Main Content Container -->
-  <div class="relative w-full h-full flex flex-col items-center justify-between p-4 sm:p-8 max-w-7xl mx-auto">
+  <div class="relative w-full h-full flex flex-col items-center justify-between p-4 sm:p-8 max-w-7xl mx-auto pointer-events-none">
     <!-- Top Bar / Counter -->
-    <div class="w-full flex justify-between items-center text-sm text-slate-400 pt-2 px-2">
-      <span id="lightbox-counter" class="font-mono text-xs tracking-wider"></span>
+    <div class="w-full flex justify-between items-center text-sm text-slate-400 pt-2 px-2 pointer-events-auto">
+      <span id="lightbox-counter" class="font-mono text-xs tracking-wider">
+        1 / {photos.length}
+      </span>
     </div>
 
-    <!-- Center Image Container -->
-    <div class="flex-1 flex items-center justify-center w-full max-h-[78vh] my-auto">
-      <img
-        id="lightbox-img"
-        src=""
-        alt=""
-        class="max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] object-contain rounded-lg shadow-2xl transition-all duration-200"
-      />
+    <!-- Center Slides Container -->
+    <div
+      id="lightbox-slides-container"
+      class="relative flex-1 flex items-center justify-center w-full max-h-[78vh] my-auto overflow-hidden pointer-events-auto"
+    >
+      {
+        photos.map((photo, index) => {
+          const photoLocation = photo.location || defaultLocation;
+          return (
+            <div
+              class="lightbox-slide absolute inset-0 flex items-center justify-center transition-opacity duration-250 ease-out opacity-0 pointer-events-none select-none"
+              data-slide-index={index}
+              data-caption={photo.caption || photo.alt || ""}
+              data-location={photoLocation}
+              data-camera={photo.camera || ""}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt || photo.caption || `${title} photograph ${index + 1}`}
+                width={1920}
+                quality={85}
+                format="webp"
+                widths={[640, 1080, 1600, 1920]}
+                sizes="(max-width: 768px) 95vw, 85vw"
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
+                class="max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] w-auto h-auto object-contain rounded-lg shadow-2xl"
+              />
+            </div>
+          );
+        })
+      }
     </div>
 
     <!-- Bottom Caption & Metadata Bar -->
-    <div class="w-full bg-slate-900/80 border border-white/10 rounded-xl p-4 text-center sm:text-left sm:flex sm:items-center sm:justify-between gap-4 backdrop-blur-sm">
+    <div class="w-full bg-slate-900/80 border border-white/10 rounded-xl p-4 text-center sm:text-left sm:flex sm:items-center sm:justify-between gap-4 backdrop-blur-sm pointer-events-auto">
       <div>
         <p id="lightbox-caption" class="text-white font-medium text-base sm:text-lg mb-1"></p>
         <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-slate-300">
@@ -77,164 +126,221 @@ import Icon from "./Icon.astro";
 </div>
 
 <script>
-  interface PhotoData {
-    src: string;
-    alt: string;
-    caption: string;
-    location: string;
-    camera: string;
+  let currentIndex = 0;
+  let isOpen = false;
+
+  function getLightbox(): HTMLElement | null {
+    return document.getElementById("photo-lightbox");
   }
 
-  function initLightbox() {
-    const lightbox = document.getElementById("photo-lightbox");
+  function getSlides(lightbox: HTMLElement): HTMLDivElement[] {
+    return Array.from(lightbox.querySelectorAll<HTMLDivElement>(".lightbox-slide"));
+  }
+
+  function showSlide(index: number) {
+    const lightbox = getLightbox();
     if (!lightbox) return;
+    const slides = getSlides(lightbox);
+    if (slides.length === 0) return;
 
-    // Prevent duplicate global initialization
-    if ((window as any).__photoLightboxInitialized) return;
-    (window as any).__photoLightboxInitialized = true;
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
+    currentIndex = index;
 
-    let currentIndex = 0;
-    let isOpen = false;
+    const captionEl = document.getElementById("lightbox-caption");
+    const counterEl = document.getElementById("lightbox-counter");
+    const locationEl = document.getElementById("lightbox-location");
+    const locationText = locationEl?.querySelector(".location-text");
+    const cameraEl = document.getElementById("lightbox-camera");
+    const cameraText = cameraEl?.querySelector(".camera-text");
 
-    function getPhotos(): PhotoData[] {
-      const items = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
-      return items.map((el) => ({
-        src: el.dataset.photoSrc || el.getAttribute("data-photo-src") || "",
-        alt: el.dataset.photoAlt || el.getAttribute("data-photo-alt") || "",
-        caption: el.dataset.photoCaption || el.getAttribute("data-photo-caption") || "",
-        location: el.dataset.photoLocation || el.getAttribute("data-photo-location") || "",
-        camera: el.dataset.photoCamera || el.getAttribute("data-photo-camera") || "",
-      }));
-    }
+    slides.forEach((slide, idx) => {
+      if (idx === currentIndex) {
+        slide.classList.remove("opacity-0", "pointer-events-none");
+        slide.classList.add("opacity-100", "pointer-events-auto");
 
-    function renderPhoto(index: number) {
-      const photos = getPhotos();
-      if (photos.length === 0) return;
+        const activeImg = slide.querySelector<HTMLImageElement>("img");
+        if (activeImg) {
+          activeImg.loading = "eager";
+          activeImg.decode?.().catch(() => {});
+        }
 
-      if (index < 0) index = photos.length - 1;
-      if (index >= photos.length) index = 0;
-      currentIndex = index;
+        // Preload adjacent slides
+        const nextIdx = (currentIndex + 1) % slides.length;
+        const prevIdx = (currentIndex - 1 + slides.length) % slides.length;
+        [nextIdx, prevIdx].forEach((i) => {
+          const adjImg = slides[i]?.querySelector<HTMLImageElement>("img");
+          if (adjImg) {
+            adjImg.loading = "eager";
+            adjImg.decode?.().catch(() => {});
+          }
+        });
 
-      const p = photos[currentIndex];
-      if (!p) return;
+        // Update caption & metadata
+        const caption = slide.dataset.caption || "";
+        const location = slide.dataset.location || "";
+        const camera = slide.dataset.camera || "";
 
-      const currentImg = document.getElementById("lightbox-img") as HTMLImageElement;
-      const currentCaption = document.getElementById("lightbox-caption");
-      const currentLocationText = document.querySelector("#lightbox-location .location-text");
-      const currentLocationContainer = document.getElementById("lightbox-location");
-      const currentCameraText = document.querySelector("#lightbox-camera .camera-text");
-      const currentCameraContainer = document.getElementById("lightbox-camera");
-      const currentCounter = document.getElementById("lightbox-counter");
+        if (captionEl) captionEl.textContent = caption;
 
-      if (currentImg) {
-        currentImg.src = p.src;
-        currentImg.alt = p.alt || p.caption || "Photograph";
+        if (locationEl && locationText) {
+          if (location) {
+            locationText.textContent = location;
+            locationEl.classList.remove("hidden");
+          } else {
+            locationEl.classList.add("hidden");
+          }
+        }
+
+        if (cameraEl && cameraText) {
+          if (camera) {
+            cameraText.textContent = camera;
+            cameraEl.classList.remove("hidden");
+          } else {
+            cameraEl.classList.add("hidden");
+          }
+        }
+
+        if (counterEl) {
+          counterEl.textContent = `${currentIndex + 1} / ${slides.length}`;
+        }
+      } else {
+        slide.classList.remove("opacity-100", "pointer-events-auto");
+        slide.classList.add("opacity-0", "pointer-events-none");
       }
+    });
+  }
 
-      if (currentCaption) {
-        currentCaption.textContent = p.caption || p.alt || "";
+  function openLightbox(index: number) {
+    const lightbox = getLightbox();
+    if (!lightbox) return;
+    isOpen = true;
+    showSlide(index);
+    lightbox.classList.remove("hidden");
+    lightbox.classList.add("flex");
+    void lightbox.offsetWidth; // Force DOM reflow for CSS opacity transition
+    lightbox.classList.remove("opacity-0");
+    lightbox.classList.add("opacity-100");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    const lightbox = getLightbox();
+    if (!lightbox) return;
+    isOpen = false;
+    lightbox.classList.remove("opacity-100");
+    lightbox.classList.add("opacity-0");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    setTimeout(() => {
+      if (!isOpen && lightbox) {
+        lightbox.classList.remove("flex");
+        lightbox.classList.add("hidden");
       }
+    }, 300);
+  }
 
-      if (currentLocationContainer && currentLocationText) {
-        if (p.location) {
-          currentLocationText.textContent = p.location;
-          currentLocationContainer.classList.remove("hidden");
+  function preloadAllImages() {
+    const lightbox = getLightbox();
+    if (!lightbox) return;
+    const slides = getSlides(lightbox);
+    slides.forEach((slide) => {
+      const img = slide.querySelector<HTMLImageElement>("img");
+      if (img) {
+        if (img.loading === "lazy") {
+          img.loading = "eager";
+        }
+        if (img.complete) {
+          img.decode?.().catch(() => {});
         } else {
-          currentLocationContainer.classList.add("hidden");
+          img.addEventListener("load", () => img.decode?.().catch(() => {}), { once: true });
         }
       }
+    });
+  }
 
-      if (currentCameraContainer && currentCameraText) {
-        if (p.camera) {
-          currentCameraText.textContent = p.camera;
-          currentCameraContainer.classList.remove("hidden");
-        } else {
-          currentCameraContainer.classList.add("hidden");
-        }
-      }
-
-      if (currentCounter) {
-        currentCounter.textContent = `${currentIndex + 1} / ${photos.length}`;
-      }
+  function onPageLoad() {
+    isOpen = false;
+    document.body.style.overflow = "";
+    const lightbox = getLightbox();
+    if (lightbox) {
+      lightbox.classList.add("hidden");
+      lightbox.classList.remove("flex", "opacity-100");
+      lightbox.classList.add("opacity-0");
     }
 
-    function openLightbox(index: number) {
-      const currentLightbox = document.getElementById("photo-lightbox");
-      if (!currentLightbox) return;
-      isOpen = true;
-      renderPhoto(index);
-      currentLightbox.classList.remove("opacity-0", "pointer-events-none");
-      currentLightbox.classList.add("opacity-100", "pointer-events-auto");
-      document.body.style.overflow = "hidden";
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(preloadAllImages, { timeout: 2000 });
+    } else {
+      setTimeout(preloadAllImages, 200);
     }
+  }
 
-    function closeLightbox() {
-      const currentLightbox = document.getElementById("photo-lightbox");
-      if (!currentLightbox) return;
-      isOpen = false;
-      currentLightbox.classList.add("opacity-0", "pointer-events-none");
-      currentLightbox.classList.remove("opacity-100", "pointer-events-auto");
-      document.body.style.overflow = "";
-      const currentImg = document.getElementById("lightbox-img") as HTMLImageElement;
-      if (currentImg) currentImg.src = "";
-    }
+  // Attach global document listeners once across all client navigation
+  if (!(window as any).__photoLightboxGlobalDelegatorAttached) {
+    (window as any).__photoLightboxGlobalDelegatorAttached = true;
 
-    // Event delegation on document for photo clicks
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      // Check if photo item was clicked
+      // Click on thumbnail
       const photoItem = target.closest<HTMLElement>("[data-photo-item]");
       if (photoItem) {
         e.preventDefault();
         e.stopPropagation();
-        const allItems = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
-        const idx = allItems.indexOf(photoItem);
-        if (idx !== -1) {
-          openLightbox(idx);
+        const customIdx = photoItem.dataset.photoIndex;
+        let targetIndex = 0;
+        if (customIdx !== undefined) {
+          targetIndex = parseInt(customIdx, 10);
+        } else {
+          const allItems = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-item]"));
+          targetIndex = allItems.indexOf(photoItem);
         }
+        openLightbox(targetIndex);
         return;
       }
 
-      // Check if close button was clicked
+      const lightbox = getLightbox();
+      if (!lightbox || lightbox.classList.contains("hidden")) return;
+
+      // Click close button
       if (target.closest("#lightbox-close")) {
         e.preventDefault();
         closeLightbox();
         return;
       }
 
-      // Check if previous button was clicked
+      // Click prev button
       if (target.closest("#lightbox-prev")) {
         e.preventDefault();
-        renderPhoto(currentIndex - 1);
+        showSlide(currentIndex - 1);
         return;
       }
 
-      // Check if next button was clicked
+      // Click next button
       if (target.closest("#lightbox-next")) {
         e.preventDefault();
-        renderPhoto(currentIndex + 1);
+        showSlide(currentIndex + 1);
         return;
       }
 
-      // Check if background backdrop was clicked
-      if (target.id === "photo-lightbox") {
+      // Click backdrop (outside content)
+      if (target === lightbox || target.id === "lightbox-slides-container") {
         e.preventDefault();
         closeLightbox();
         return;
       }
     });
 
-    // Keyboard handlers
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!isOpen) return;
       if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") renderPhoto(currentIndex - 1);
-      if (e.key === "ArrowRight") renderPhoto(currentIndex + 1);
+      if (e.key === "ArrowLeft") showSlide(currentIndex - 1);
+      if (e.key === "ArrowRight") showSlide(currentIndex + 1);
     });
 
-    // Touch swipe support for mobile
     let touchStartX = 0;
     let touchEndX = 0;
 
@@ -255,9 +361,9 @@ import Icon from "./Icon.astro";
         const swipeDistance = touchEndX - touchStartX;
         if (Math.abs(swipeDistance) > 50) {
           if (swipeDistance > 0) {
-            renderPhoto(currentIndex - 1);
+            showSlide(currentIndex - 1);
           } else {
-            renderPhoto(currentIndex + 1);
+            showSlide(currentIndex + 1);
           }
         }
       },
@@ -265,10 +371,7 @@ import Icon from "./Icon.astro";
     );
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initLightbox);
-  } else {
-    initLightbox();
-  }
-  document.addEventListener("astro:page-load", initLightbox);
+  // Run on initial load and on Astro View Transitions
+  onPageLoad();
+  document.addEventListener("astro:page-load", onPageLoad);
 </script>

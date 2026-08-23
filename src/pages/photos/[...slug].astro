@@ -1,6 +1,6 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
-import { Image, getImage } from "astro:assets";
+import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import Icon from "../../components/Icon.astro";
@@ -19,22 +19,6 @@ type Props = CollectionEntry<"galleries">;
 const gallery = Astro.props;
 const { Content } = await render(gallery);
 const { title, description, pubDate, location, photos = [], coverImage } = gallery.data;
-
-// Pre-optimize high-resolution images for the lightbox
-const optimizedPhotos = await Promise.all(
-  photos.map(async (photo) => {
-    const fullOptimized = await getImage({
-      src: photo.src,
-      width: Math.min(photo.src.width, 2000),
-      quality: 85,
-      format: "webp",
-    });
-    return {
-      ...photo,
-      lightboxSrc: fullOptimized.src,
-    };
-  })
-);
 
 const coverImageSrc =
   typeof coverImage === "object" && coverImage !== null
@@ -187,7 +171,7 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
   <section class="mt-8">
     <div class="photo-gallery">
       {
-        optimizedPhotos.map((photo, index) => {
+        photos.map((photo, index) => {
           const ar =
             photo.src.width && photo.src.height
               ? photo.src.width / photo.src.height
@@ -203,20 +187,14 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
                 maxWidth: "100%",
               }}
               data-photo-item
-              data-photo-src={photo.lightboxSrc}
-              data-photo-alt={
-                photo.alt || photo.caption || `${title} photo ${index + 1}`
-              }
-              data-photo-caption={photo.caption || ""}
-              data-photo-location={photo.location || location || ""}
-              data-photo-camera={photo.camera || ""}
+              data-photo-index={index}
               aria-label={`Open photo: ${photo.caption || title}`}
             >
               <Image
                 src={photo.src}
                 alt={photo.alt || photo.caption || title}
                 width={600}
-                quality={80}
+                quality={85}
                 format="webp"
                 widths={[360, 600, 900]}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
@@ -247,5 +225,5 @@ const PAGE_TITLE = `${title} | Photography | Ryan Haack`;
   </section>
 
   <!-- Lightbox Modal -->
-  <PhotoLightbox />
+  <PhotoLightbox photos={photos} title={title} defaultLocation={location} />
 </BaseLayout>
