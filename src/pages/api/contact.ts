@@ -46,9 +46,10 @@ export const POST: APIRoute = async ({ request }) => {
     const resendApiKey =
       cfEnv.RESEND_API_KEY ||
       (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : undefined);
-    const turnstileSecret =
-      cfEnv.TURNSTILE_SECRET_KEY ||
-      (typeof process !== "undefined" ? process.env?.TURNSTILE_SECRET_KEY : undefined);
+    const turnstileSecret = import.meta.env.DEV
+      ? "1x0000000000000000000000000000000AA"
+      : cfEnv.TURNSTILE_SECRET_KEY ||
+        (typeof process !== "undefined" ? process.env?.TURNSTILE_SECRET_KEY : undefined);
 
     // 2. Cloudflare Turnstile Verification (if secret key is configured)
     if (turnstileSecret) {

@@ -1,7 +1,8 @@
 ---
-// Site key can be set in environment variables or defaults to Cloudflare's always-pass testing key
-const TURNSTILE_SITE_KEY =
-  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
+// Use Cloudflare's always-pass testing key in dev mode, or production key in build/production
+const TURNSTILE_SITE_KEY = import.meta.env.DEV
+  ? "1x00000000000000000000AA"
+  : (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA");
 ---
 
 <form

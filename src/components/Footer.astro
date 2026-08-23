@@ -32,7 +32,7 @@ const SOCIAL_LINKS = [
 const { c } = Astro.props;
 ---
 
-<footer class:list={["text-cyan-900 dark:text-slate-400", c]}>
+<footer class:list={["text-cyan-900 dark:text-slate-400 text-center bg-slate-100 dark:bg-inherit", c]}>
   <div class="py-8">
     <div class="mb-4">
       <ul class="flex text-center justify-center gap-3">
@@ -70,11 +70,4 @@ const { c } = Astro.props;
     </p>
   </div>
 </footer>
-<style>
-  footer {
-    background: linear-gradient(var(--gray-gradient)) no-repeat;
-    color: rgb(var(--gray));
-    text-align: center;
-  }
-</style>
 
