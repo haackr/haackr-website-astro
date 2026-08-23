@@ -92,7 +92,7 @@ const { photos = [], title = "Photo Gallery", defaultLocation = "" } = Astro.pro
                 format="webp"
                 widths={[640, 1080, 1600, 1920]}
                 sizes="(max-width: 768px) 95vw, 85vw"
-                loading={index === 0 ? "eager" : "lazy"}
+                loading="lazy"
                 decoding="async"
                 class="max-h-[75vh] max-w-[92vw] sm:max-w-[85vw] w-auto h-auto object-contain rounded-lg shadow-2xl"
               />
@@ -137,6 +137,22 @@ const { photos = [], title = "Photo Gallery", defaultLocation = "" } = Astro.pro
     return Array.from(lightbox.querySelectorAll<HTMLDivElement>(".lightbox-slide"));
   }
 
+  // Preload and decode a single slide just-in-time
+  function preloadSlide(index: number) {
+    const lightbox = getLightbox();
+    if (!lightbox) return;
+    const slides = getSlides(lightbox);
+    if (index < 0 || index >= slides.length) return;
+    const slide = slides[index];
+    const img = slide?.querySelector<HTMLImageElement>("img");
+    if (img) {
+      if (img.loading === "lazy") {
+        img.loading = "eager";
+      }
+      img.decode?.().catch(() => {});
+    }
+  }
+
   function showSlide(index: number) {
     const lightbox = getLightbox();
     if (!lightbox) return;
@@ -159,22 +175,10 @@ const { photos = [], title = "Photo Gallery", defaultLocation = "" } = Astro.pro
         slide.classList.remove("opacity-0", "pointer-events-none");
         slide.classList.add("opacity-100", "pointer-events-auto");
 
-        const activeImg = slide.querySelector<HTMLImageElement>("img");
-        if (activeImg) {
-          activeImg.loading = "eager";
-          activeImg.decode?.().catch(() => {});
-        }
-
-        // Preload adjacent slides
-        const nextIdx = (currentIndex + 1) % slides.length;
-        const prevIdx = (currentIndex - 1 + slides.length) % slides.length;
-        [nextIdx, prevIdx].forEach((i) => {
-          const adjImg = slides[i]?.querySelector<HTMLImageElement>("img");
-          if (adjImg) {
-            adjImg.loading = "eager";
-            adjImg.decode?.().catch(() => {});
-          }
-        });
+        // Preload active slide and immediate next/previous slides
+        preloadSlide(currentIndex);
+        preloadSlide((currentIndex + 1) % slides.length);
+        preloadSlide((currentIndex - 1 + slides.length) % slides.length);
 
         // Update caption & metadata
         const caption = slide.dataset.caption || "";
@@ -241,25 +245,6 @@ const { photos = [], title = "Photo Gallery", defaultLocation = "" } = Astro.pro
     }, 300);
   }
 
-  function preloadAllImages() {
-    const lightbox = getLightbox();
-    if (!lightbox) return;
-    const slides = getSlides(lightbox);
-    slides.forEach((slide) => {
-      const img = slide.querySelector<HTMLImageElement>("img");
-      if (img) {
-        if (img.loading === "lazy") {
-          img.loading = "eager";
-        }
-        if (img.complete) {
-          img.decode?.().catch(() => {});
-        } else {
-          img.addEventListener("load", () => img.decode?.().catch(() => {}), { once: true });
-        }
-      }
-    });
-  }
-
   function onPageLoad() {
     isOpen = false;
     document.body.style.overflow = "";
@@ -269,17 +254,26 @@ const { photos = [], title = "Photo Gallery", defaultLocation = "" } = Astro.pro
       lightbox.classList.remove("flex", "opacity-100");
       lightbox.classList.add("opacity-0");
     }
-
-    if ("requestIdleCallback" in window) {
-      (window as any).requestIdleCallback(preloadAllImages, { timeout: 2000 });
-    } else {
-      setTimeout(preloadAllImages, 200);
-    }
   }
 
   // Attach global document listeners once across all client navigation
   if (!(window as any).__photoLightboxGlobalDelegatorAttached) {
     (window as any).__photoLightboxGlobalDelegatorAttached = true;
+
+    // Preload full-res photo as soon as user hovers over/focuses thumbnail (intent to click)
+    document.addEventListener(
+      "pointerover",
+      (e) => {
+        const target = e.target as HTMLElement | null;
+        const photoItem = target?.closest<HTMLElement>("[data-photo-item]");
+        if (!photoItem) return;
+        const customIdx = photoItem.dataset.photoIndex;
+        if (customIdx !== undefined) {
+          preloadSlide(parseInt(customIdx, 10));
+        }
+      },
+      { passive: true }
+    );
 
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement | null;
